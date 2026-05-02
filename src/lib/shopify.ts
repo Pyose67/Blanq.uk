@@ -180,10 +180,10 @@ const PRODUCT_FIELDS = `
       }
     }
   }
-  sizeGuide: metafield(namespace: "blanq", key: "size_guide") { value type }
-  materialProps: metafield(namespace: "blanq", key: "material_props") { value type }
-  techNotes: metafield(namespace: "blanq", key: "tech_notes") { value type }
-  fitNotes: metafield(namespace: "blanq", key: "fit_notes") { value type }
+sizeGuide: metafield(namespace: "custom", key: "size_guide") { value type }
+  materialProps: metafield(namespace: "custom", key: "propriedades_do_material") { value type }
+  techNotes: metafield(namespace: "custom", key: "tech_notes") { value type }
+  fitNotes: metafield(namespace: "custom", key: "fit_notes") { value type }
 `;
 
 const PRODUCTS_QUERY = `
