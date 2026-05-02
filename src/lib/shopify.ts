@@ -42,11 +42,7 @@ export interface ShopifyProductOption {
 }
 
 export interface SizeGuideRow {
-  size: string;
-  chest: string;
-  shoulder: string;
-  length: string;
-  sleeve: string;
+  [key: string]: string;
 }
 
 export interface ShopifyProduct {
@@ -523,9 +519,9 @@ export const siteConfig = {
   brand: "BLANQ",
   slogan: "Quiet luxury, commanding presence.",
   socials: {
-    instagram: "https://instagram.com/blanq",
-    pinterest: "https://pinterest.com/blanq",
-    facebook: "https://facebook.com/blanq",
+    instagram: "https://www.instagram.com/blanq.uk",
+    pinterest: "https://pin.it/6oVKNnUoG",
+    facebook: "https://www.facebook.com/profile.php?id=61588233546543",
   },
   contact: {
     address: "14 Marylebone Lane, London, W1U 2NE",

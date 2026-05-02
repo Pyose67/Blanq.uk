@@ -412,28 +412,34 @@ function SizeGuideDialog({ product }: { product: ShopifyProduct }) {
           </DialogDescription>
         </DialogHeader>
         <div className="mt-4 overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border">
-                <th className="eyebrow !text-foreground/60 py-3 text-left">Size</th>
-                <th className="eyebrow !text-foreground/60 py-3 text-left">Chest</th>
-                <th className="eyebrow !text-foreground/60 py-3 text-left">Shoulder</th>
-                <th className="eyebrow !text-foreground/60 py-3 text-left">Length</th>
-                <th className="eyebrow !text-foreground/60 py-3 text-left">Sleeve</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {rows.map((r) => (
-                <tr key={r.size}>
-                  <td className="py-3 font-serif text-ink">{r.size}</td>
-                  <td className="py-3 tabular-nums">{r.chest}</td>
-                  <td className="py-3 tabular-nums">{r.shoulder}</td>
-                  <td className="py-3 tabular-nums">{r.length}</td>
-                  <td className="py-3 tabular-nums">{r.sleeve}</td>
+{rows && rows.length > 0 && (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border">
+                  {Object.keys(rows[0]).map((col, index) => (
+                    <th key={index} className="eyebrow !text-foreground/60 py-3 text-left uppercase">
+                      {col}
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {rows.map((r, rowIndex) => (
+                  <tr key={rowIndex}>
+                    {Object.keys(rows[0]).map((col, colIndex) => (
+                      <td 
+                        key={colIndex} 
+                        className={`py-3 ${colIndex === 0 ? "font-serif text-ink" : "tabular-nums"}`}
+                      >
+                        {/* O 'as any' abaixo é o que resolve o chilique do TypeScript */}
+                        {(r as any)[col]}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
         <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
           Garment measurements. For body measurements, allow 4–6 cm of ease across the chest.
