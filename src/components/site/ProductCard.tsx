@@ -13,11 +13,7 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
   }, [product.id]);
 
   return (
-    <Link
-      to="/product/$slug"
-      params={{ slug: product.handle }}
-      className="group block"
-    >
+    <Link to="/product/$slug" params={{ slug: product.handle }} className="group block">
       <div className="relative overflow-hidden bg-muted aspect-[4/5]">
         {image && (
           <img

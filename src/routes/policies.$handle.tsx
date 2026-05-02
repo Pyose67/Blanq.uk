@@ -22,7 +22,10 @@ export const Route = createFileRoute("/policies/$handle")({
     <div className="mx-auto max-w-2xl px-6 md:px-10 py-32 md:py-40 text-center">
       <p className="eyebrow mb-4">Not found</p>
       <h1 className="font-serif text-3xl text-ink">This policy is not available</h1>
-      <Link to="/" className="mt-6 inline-block link-underline text-[11px] uppercase tracking-[0.22em]">
+      <Link
+        to="/"
+        className="mt-6 inline-block link-underline text-[11px] uppercase tracking-[0.22em]"
+      >
         Return home
       </Link>
     </div>
@@ -40,7 +43,9 @@ function PolicyPage() {
   return (
     <article className="mx-auto max-w-3xl px-5 md:px-10 py-20 md:py-28">
       <p className="eyebrow mb-6">
-        <Link to="/" className="link-underline">Home</Link>
+        <Link to="/" className="link-underline">
+          Home
+        </Link>
         <span className="mx-2">/</span>
         <span>Policies</span>
       </p>

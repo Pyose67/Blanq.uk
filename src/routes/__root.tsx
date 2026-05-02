@@ -31,14 +31,34 @@ export const Route = createRootRoute({
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Blanq" },
-      { name: "description", content: "BLANQ. Considered essentials in the world's finest natural fibres. Quiet luxury, commanding presence." },
+      {
+        name: "description",
+        content:
+          "BLANQ. Considered essentials in the world's finest natural fibres. Quiet luxury, commanding presence.",
+      },
       { name: "author", content: "BLANQ" },
       { property: "og:title", content: "Blanq" },
       { name: "twitter:title", content: "Blanq" },
-      { property: "og:description", content: "BLANQ. Considered essentials in the world's finest natural fibres. Quiet luxury, commanding presence." },
-      { name: "twitter:description", content: "BLANQ. Considered essentials in the world's finest natural fibres. Quiet luxury, commanding presence." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4278a082-40fb-4962-ba51-80186ae41180/id-preview-693baf06--443fc15a-9865-4fae-8f67-d53f02f994ea.lovable.app-1777249020839.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4278a082-40fb-4962-ba51-80186ae41180/id-preview-693baf06--443fc15a-9865-4fae-8f67-d53f02f994ea.lovable.app-1777249020839.png" },
+      {
+        property: "og:description",
+        content:
+          "BLANQ. Considered essentials in the world's finest natural fibres. Quiet luxury, commanding presence.",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "BLANQ. Considered essentials in the world's finest natural fibres. Quiet luxury, commanding presence.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4278a082-40fb-4962-ba51-80186ae41180/id-preview-693baf06--443fc15a-9865-4fae-8f67-d53f02f994ea.lovable.app-1777249020839.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4278a082-40fb-4962-ba51-80186ae41180/id-preview-693baf06--443fc15a-9865-4fae-8f67-d53f02f994ea.lovable.app-1777249020839.png",
+      },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:type", content: "website" },
     ],

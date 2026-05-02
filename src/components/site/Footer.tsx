@@ -16,7 +16,9 @@ export function Footer() {
   const [policies, setPolicies] = useState<ShopPolicies | null>(null);
 
   useEffect(() => {
-    getShopPolicies().then(setPolicies).catch(() => setPolicies(null));
+    getShopPolicies()
+      .then(setPolicies)
+      .catch(() => setPolicies(null));
   }, []);
 
   const policyLinks = [
@@ -33,29 +35,67 @@ export function Footer() {
           <div>
             <p className="eyebrow mb-6">House</p>
             <ul className="space-y-3 text-sm">
-              <li><Link to="/philosophy" className="link-underline">Philosophy</Link></li>
-              <li><span className="text-muted-foreground">Provenance</span></li>
-              <li><span className="text-muted-foreground">Atelier</span></li>
+              <li>
+                <Link to="/philosophy" className="link-underline">
+                  Philosophy
+                </Link>
+              </li>
+              <li>
+                <span className="text-muted-foreground">Provenance</span>
+              </li>
+              <li>
+                <span className="text-muted-foreground">Atelier</span>
+              </li>
             </ul>
           </div>
           <div>
             <p className="eyebrow mb-6">Catalogue</p>
             <ul className="space-y-3 text-sm">
-              <li><Link to="/collections/$series" params={{ series: "merino" }} className="link-underline">The Merino Series</Link></li>
-              <li><Link to="/collections/$series" params={{ series: "core" }} className="link-underline">The Core Collection</Link></li>
-              <li><Link to="/collections/$series" params={{ series: "new" }} className="link-underline">New Arrivals</Link></li>
+              <li>
+                <Link
+                  to="/collections/$series"
+                  params={{ series: "merino" }}
+                  className="link-underline"
+                >
+                  The Merino Series
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/collections/$series"
+                  params={{ series: "core" }}
+                  className="link-underline"
+                >
+                  The Core Collection
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/collections/$series"
+                  params={{ series: "new" }}
+                  className="link-underline"
+                >
+                  New Arrivals
+                </Link>
+              </li>
             </ul>
           </div>
           <div>
             <p className="eyebrow mb-6">Policies</p>
             <ul className="space-y-3 text-sm">
-              {policyLinks.filter((p) => p.policy).map((p) => (
-                <li key={p.policy!.handle}>
-                  <Link to="/policies/$handle" params={{ handle: p.policy!.handle }} className="link-underline">
-                    {p.label}
-                  </Link>
-                </li>
-              ))}
+              {policyLinks
+                .filter((p) => p.policy)
+                .map((p) => (
+                  <li key={p.policy!.handle}>
+                    <Link
+                      to="/policies/$handle"
+                      params={{ handle: p.policy!.handle }}
+                      className="link-underline"
+                    >
+                      {p.label}
+                    </Link>
+                  </li>
+                ))}
               {!policies && <li className="text-muted-foreground text-xs">Loading…</li>}
             </ul>
           </div>
@@ -63,20 +103,32 @@ export function Footer() {
             <p className="eyebrow mb-6">House Notes</p>
             <ul className="space-y-3 text-sm">
               <li>
-                <a href={siteConfig.socials.instagram} target="_blank" rel="noreferrer"
-                  className="inline-flex items-center gap-2 link-underline">
+                <a
+                  href={siteConfig.socials.instagram}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 link-underline"
+                >
                   <Instagram className="h-4 w-4" strokeWidth={1.4} /> Instagram
                 </a>
               </li>
               <li>
-                <a href={siteConfig.socials.pinterest} target="_blank" rel="noreferrer"
-                  className="inline-flex items-center gap-2 link-underline">
+                <a
+                  href={siteConfig.socials.pinterest}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 link-underline"
+                >
                   <PinterestIcon className="h-4 w-4" /> Pinterest
                 </a>
               </li>
               <li>
-                <a href={siteConfig.socials.facebook} target="_blank" rel="noreferrer"
-                  className="inline-flex items-center gap-2 link-underline">
+                <a
+                  href={siteConfig.socials.facebook}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 link-underline"
+                >
                   <Facebook className="h-4 w-4" strokeWidth={1.4} /> Facebook
                 </a>
               </li>
@@ -93,9 +145,7 @@ export function Footer() {
             <PaymentIcons className="text-foreground/70" />
           </div>
           <div className="md:text-right">
-            <p className="font-serif italic text-sm text-foreground/70">
-              {siteConfig.slogan}
-            </p>
+            <p className="font-serif italic text-sm text-foreground/70">{siteConfig.slogan}</p>
             <p className="mt-2 text-xs text-muted-foreground tracking-wide">
               © {new Date().getFullYear()} {siteConfig.brand}. Registered in England &amp; Wales.
             </p>

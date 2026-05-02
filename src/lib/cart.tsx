@@ -8,10 +8,10 @@ import { storefrontApiRequest } from "@/lib/shopify";
 // =====================================================================
 
 export type CartItem = {
-  id: string;            // local id: variantId (stable, unique per merch)
+  id: string; // local id: variantId (stable, unique per merch)
   lineId: string | null; // Shopify cart line ID (null until synced)
   slug: string;
-  variantId: string;     // gid://shopify/ProductVariant/...
+  variantId: string; // gid://shopify/ProductVariant/...
   name: string;
   image: string;
   size: string;

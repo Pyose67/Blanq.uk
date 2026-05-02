@@ -37,9 +37,7 @@ function Home() {
       });
   }, []);
 
-  const merino = (products ?? []).filter((p) =>
-    /merino|knit/i.test(`${p.title} ${p.productType}`),
-  );
+  const merino = (products ?? []).filter((p) => /merino|knit/i.test(`${p.title} ${p.productType}`));
   const others = (products ?? []).filter((p) => !merino.includes(p));
   const featured = (products ?? []).slice(0, 3);
 
@@ -61,11 +59,13 @@ function Home() {
               Autumn / Winter — Vol. I
             </p>
             <h1 className="font-serif text-offwhite text-5xl md:text-7xl lg:text-[5.5rem] leading-[1.05] tracking-[-0.015em]">
-              Engineering<br />
+              Engineering
+              <br />
               <em className="font-normal italic">silence.</em>
             </h1>
             <p className="mt-8 text-offwhite/85 text-base md:text-lg max-w-md leading-relaxed font-light">
-              A new standard of essentials, drawn from the world's finest natural fibres and resolved into garments without ornament.
+              A new standard of essentials, drawn from the world's finest natural fibres and
+              resolved into garments without ornament.
             </p>
             <div className="mt-10 flex items-center gap-8">
               <Link
@@ -92,7 +92,8 @@ function Home() {
           <p className="md:col-span-3 eyebrow">A House Note</p>
           <div className="md:col-span-8 md:col-start-5">
             <p className="font-serif text-2xl md:text-4xl leading-[1.35] text-foreground">
-              We do not produce trends. We produce a small number of garments, considered slowly, in materials that justify the time given to them.
+              We do not produce trends. We produce a small number of garments, considered slowly, in
+              materials that justify the time given to them.
             </p>
           </div>
         </div>
@@ -134,7 +135,10 @@ function Home() {
                 A single fibre, finished in Biella.
               </h3>
               <p className="text-muted-foreground leading-relaxed mb-10">
-                We work with one classification of wool, sourced from a single growing region in New South Wales. The fineness of the fibre — 17.9 microns — sits at the threshold between strength and softness. It is spun, knitted and finished in the same valley in Northern Italy.
+                We work with one classification of wool, sourced from a single growing region in New
+                South Wales. The fineness of the fibre — 17.9 microns — sits at the threshold
+                between strength and softness. It is spun, knitted and finished in the same valley
+                in Northern Italy.
               </p>
               <div className="grid grid-cols-2 gap-6 max-w-md">
                 {merino.slice(0, 4).map((p) => (
@@ -205,10 +209,14 @@ function Home() {
             </div>
             <div className="md:col-span-8 md:col-start-5">
               <h2 className="font-serif text-3xl md:text-5xl leading-[1.2] text-offwhite">
-                Global to global. We travel to the source — a wool station in New South Wales, a cotton mill in Porto, a tailoring house in Naples — and we work directly with the people who make.
+                Global to global. We travel to the source — a wool station in New South Wales, a
+                cotton mill in Porto, a tailoring house in Naples — and we work directly with the
+                people who make.
               </h2>
               <p className="mt-10 text-offwhite/75 leading-relaxed max-w-2xl font-light">
-                There is no logic in shipping mediocre raw materials across the world. There is logic in finding the finest version of a single material and treating it with restraint. This is the discipline that defines the house.
+                There is no logic in shipping mediocre raw materials across the world. There is
+                logic in finding the finest version of a single material and treating it with
+                restraint. This is the discipline that defines the house.
               </p>
               <div className="mt-12">
                 <Link
@@ -258,7 +266,8 @@ function Home() {
             <div className="md:col-span-7">
               <p className="eyebrow mb-6">The Private List</p>
               <h2 className="font-serif text-3xl md:text-5xl leading-tight max-w-xl">
-                A quiet correspondence. Notes on new pieces, materials, and provenance — sent infrequently.
+                A quiet correspondence. Notes on new pieces, materials, and provenance — sent
+                infrequently.
               </h2>
             </div>
             <form

@@ -1,11 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { ProductCard } from "@/components/site/ProductCard";
-import {
-  getCollectionByHandle,
-  getAllProducts,
-  type ShopifyProduct,
-} from "@/lib/shopify";
+import { getCollectionByHandle, getAllProducts, type ShopifyProduct } from "@/lib/shopify";
 
 /**
  * Series → Shopify collection handle mapping.
@@ -151,7 +147,12 @@ function CollectionPage() {
                 <FilterGroup label="Size" options={allSizes} value={size} onChange={setSize} />
               )}
               {allColours.length > 0 && (
-                <FilterGroup label="Colour" options={allColours} value={colour} onChange={setColour} />
+                <FilterGroup
+                  label="Colour"
+                  options={allColours}
+                  value={colour}
+                  onChange={setColour}
+                />
               )}
               <p className="text-xs text-muted-foreground pt-4 border-t border-border">
                 {filtered.length} {filtered.length === 1 ? "piece" : "pieces"}

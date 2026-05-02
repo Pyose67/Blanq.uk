@@ -115,9 +115,7 @@ export function findVariant(
   product: ShopifyProduct,
   selected: Record<string, string>,
 ): ShopifyVariant | undefined {
-  return product.variants.find((v) =>
-    v.selectedOptions.every((o) => selected[o.name] === o.value),
-  );
+  return product.variants.find((v) => v.selectedOptions.every((o) => selected[o.name] === o.value));
 }
 
 // =====================================================================
@@ -261,7 +259,9 @@ function normalizeProduct(node: any): ShopifyProduct {
 }
 
 // Shopify's `rich_text_field` returns a JSON document. Convert to safe HTML.
-function parseRichTextMetafield(mf: { value: string; type?: string } | null | undefined): string | null {
+function parseRichTextMetafield(
+  mf: { value: string; type?: string } | null | undefined,
+): string | null {
   if (!mf?.value) return null;
   const raw = mf.value.trim();
   // Already HTML (some editors store HTML in multi_line_text_field used as rich text)
@@ -277,14 +277,19 @@ function parseRichTextMetafield(mf: { value: string; type?: string } | null | un
 
 function escapeHtml(s: string): string {
   return s
-    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 function richTextNodeToHtml(node: any): string {
   if (!node) return "";
   if (Array.isArray(node)) return node.map(richTextNodeToHtml).join("");
-  const children = Array.isArray(node.children) ? node.children.map(richTextNodeToHtml).join("") : "";
+  const children = Array.isArray(node.children)
+    ? node.children.map(richTextNodeToHtml).join("")
+    : "";
   switch (node.type) {
     case "root":
       return children;
@@ -327,10 +332,9 @@ export async function getAllProducts(first = 50, query?: string): Promise<Shopif
 }
 
 export async function getProductByHandle(handle: string): Promise<ShopifyProduct | null> {
-  const json = await storefrontApiRequest<{ product: any | null }>(
-    PRODUCT_BY_HANDLE_QUERY,
-    { handle },
-  );
+  const json = await storefrontApiRequest<{ product: any | null }>(PRODUCT_BY_HANDLE_QUERY, {
+    handle,
+  });
   const node = json?.data?.product;
   return node ? normalizeProduct(node) : null;
 }
@@ -503,7 +507,10 @@ export async function getPolicyByHandle(handle: string): Promise<ShopPolicyFull 
 // Helpers — case-insensitive option matching
 // =====================================================================
 
-export function findOption(product: ShopifyProduct, name: string): ShopifyProductOption | undefined {
+export function findOption(
+  product: ShopifyProduct,
+  name: string,
+): ShopifyProductOption | undefined {
   const n = name.toLowerCase();
   return product.options.find((o) => o.name.toLowerCase() === n);
 }

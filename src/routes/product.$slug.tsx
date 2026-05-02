@@ -55,7 +55,10 @@ export const Route = createFileRoute("/product/$slug")({
     <div className="py-40 text-center">
       <p className="eyebrow mb-4">Not found</p>
       <h1 className="font-serif text-3xl">This piece is no longer in the catalogue</h1>
-      <Link to="/" className="mt-6 inline-block link-underline text-[11px] uppercase tracking-[0.22em]">
+      <Link
+        to="/"
+        className="mt-6 inline-block link-underline text-[11px] uppercase tracking-[0.22em]"
+      >
         Return home
       </Link>
     </div>
@@ -103,7 +106,9 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
       {/* Breadcrumbs */}
       <div className="mx-auto max-w-[1480px] px-5 md:px-10 pt-6 md:pt-8">
         <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-          <Link to="/" className="link-underline">Home</Link>
+          <Link to="/" className="link-underline">
+            Home
+          </Link>
           <span className="mx-2">/</span>
           <span>{product.productType}</span>
           <span className="mx-2">/</span>
@@ -134,12 +139,7 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
                   className={`aspect-square bg-muted overflow-hidden border ${i === activeImage ? "border-ink" : "border-transparent"}`}
                   aria-label={`View image ${i + 1}`}
                 >
-                  <img
-                    src={img.url}
-                    alt=""
-                    loading="lazy"
-                    className="h-full w-full object-cover"
-                  />
+                  <img src={img.url} alt="" loading="lazy" className="h-full w-full object-cover" />
                 </button>
               ))}
             </div>
@@ -151,9 +151,7 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
             <h1 className="font-serif text-4xl md:text-5xl leading-[1.05] tracking-tight text-ink">
               {product.title}
             </h1>
-            <p className="mt-4 text-lg tabular-nums text-foreground">
-              {formatMoney(displayPrice)}
-            </p>
+            <p className="mt-4 text-lg tabular-nums text-foreground">{formatMoney(displayPrice)}</p>
 
             <div className="hairline my-8" />
 
@@ -166,7 +164,8 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
             {colourOption && (
               <div className="mt-8">
                 <p className="eyebrow mb-4">
-                  Colour — <span className="text-foreground/70 normal-case tracking-normal">{colour}</span>
+                  Colour —{" "}
+                  <span className="text-foreground/70 normal-case tracking-normal">{colour}</span>
                 </p>
                 <div className="flex gap-3 flex-wrap">
                   {colourOption.values.map((c) => (
@@ -202,13 +201,16 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
                         aria-label="Select size"
                         className="w-full appearance-none bg-transparent py-5 pl-1 pr-10 text-sm text-foreground focus:outline-none cursor-pointer"
                       >
-                        <option value="" disabled>Select</option>
+                        <option value="" disabled>
+                          Select
+                        </option>
                         {sizeOption.values.map((s) => {
                           const v = findVariant(product, { [colourKey]: colour, [sizeKey]: s });
                           const oos = v && !v.availableForSale;
                           return (
                             <option key={s} value={s} disabled={oos}>
-                              {s}{oos ? " — Sold out" : ""}
+                              {s}
+                              {oos ? " — Sold out" : ""}
                             </option>
                           );
                         })}
@@ -219,7 +221,9 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
                       />
                     </div>
                     <div className="flex items-center justify-center gap-6 py-5">
-                      {product.metafields.fitNotes && <FitNotesDialog html={product.metafields.fitNotes} />}
+                      {product.metafields.fitNotes && (
+                        <FitNotesDialog html={product.metafields.fitNotes} />
+                      )}
                       <SizeGuideDialog product={product} />
                     </div>
                   </div>
@@ -257,7 +261,8 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
 
             {/* Trust assurance */}
             <p className="mt-6 text-xs text-muted-foreground leading-relaxed">
-              An investment piece, made to be worn for years. Complimentary delivery within the United Kingdom. Considered returns within thirty days.
+              An investment piece, made to be worn for years. Complimentary delivery within the
+              United Kingdom. Considered returns within thirty days.
             </p>
 
             {/* Material Properties — always visible */}
@@ -268,9 +273,7 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
                   {product.metafields.materialProps!.map((p) => (
                     <li key={p.title}>
                       <p className="font-serif text-base text-ink">{p.title}</p>
-                      <p className="text-sm text-muted-foreground leading-relaxed mt-1">
-                        {p.body}
-                      </p>
+                      <p className="text-sm text-muted-foreground leading-relaxed mt-1">{p.body}</p>
                     </li>
                   ))}
                 </ul>
@@ -307,16 +310,17 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
           <div className="grid md:grid-cols-2 gap-12 md:gap-20 max-w-5xl md:ml-[calc(25%_-_2.5rem)]">
             <div>
               <p className="text-foreground/85 leading-[1.8] text-[15px]">
-                We do not use synthetic blends. The garments are drawn from a small set of natural fibres —
-                Australian Merino at 17.9 microns, long-staple Pima cotton, Italian cashmere — selected on
-                a single criterion: that the raw material itself can carry the design.
+                We do not use synthetic blends. The garments are drawn from a small set of natural
+                fibres — Australian Merino at 17.9 microns, long-staple Pima cotton, Italian
+                cashmere — selected on a single criterion: that the raw material itself can carry
+                the design.
               </p>
             </div>
             <div>
               <p className="text-foreground/85 leading-[1.8] text-[15px]">
-                Each material is traced from origin: a wool station in New South Wales, a spinning mill in
-                Biella, a tailoring house in Naples. We work directly with the people who make. Global to
-                global. No intermediaries.
+                Each material is traced from origin: a wool station in New South Wales, a spinning
+                mill in Biella, a tailoring house in Naples. We work directly with the people who
+                make. Global to global. No intermediaries.
               </p>
             </div>
           </div>
@@ -454,7 +458,9 @@ function ReviewsSection({ productId }: { productId: string }) {
   const [body, setBody] = useState("");
 
   useEffect(() => {
-    getProductReviews(productId).then(setData).catch(() => setData(null));
+    getProductReviews(productId)
+      .then(setData)
+      .catch(() => setData(null));
   }, [productId]);
 
   async function submit(e: React.FormEvent) {
@@ -462,7 +468,11 @@ function ReviewsSection({ productId }: { productId: string }) {
     if (!rating || !body.trim()) return;
     const updated = await addProductReview(productId, { author, rating, title, body });
     setData(updated);
-    setAuthor(""); setRating(0); setHover(0); setTitle(""); setBody("");
+    setAuthor("");
+    setRating(0);
+    setHover(0);
+    setTitle("");
+    setBody("");
     setShowForm(false);
   }
 
@@ -615,34 +625,79 @@ function Stars({ rating }: { rating: number }) {
 // Curated colour map for fashion-specific names. Keys are normalised (lowercase, trimmed).
 const COLOUR_MAP: Record<string, string> = {
   // Neutrals / whites
-  "white": "#ffffff", "off-white": "#f3efe6", "offwhite": "#f3efe6",
-  "ivory": "#f5f0e1", "cream": "#f1e9d2", "bone": "#e8e0d0", "ecru": "#dcd3bc",
-  "natural": "#e8dfc8", "chalk": "#f2eee5",
+  white: "#ffffff",
+  "off-white": "#f3efe6",
+  offwhite: "#f3efe6",
+  ivory: "#f5f0e1",
+  cream: "#f1e9d2",
+  bone: "#e8e0d0",
+  ecru: "#dcd3bc",
+  natural: "#e8dfc8",
+  chalk: "#f2eee5",
   // Tans / beiges
-  "sand": "#cdbfa5", "beige": "#d4c2a3", "stone": "#bfb3a0", "taupe": "#a89a86",
-  "camel": "#c19a6b", "tan": "#c39c70", "desert tan": "#c8a888", "khaki": "#b6a474",
-  "mocha": "#7a5a44", "latte": "#b69f86", "caramel": "#a87445", "cognac": "#8b4f2a",
+  sand: "#cdbfa5",
+  beige: "#d4c2a3",
+  stone: "#bfb3a0",
+  taupe: "#a89a86",
+  camel: "#c19a6b",
+  tan: "#c39c70",
+  "desert tan": "#c8a888",
+  khaki: "#b6a474",
+  mocha: "#7a5a44",
+  latte: "#b69f86",
+  caramel: "#a87445",
+  cognac: "#8b4f2a",
   // Browns
-  "brown": "#5a3d24", "chocolate": "#3d2616", "espresso": "#3a2a22", "walnut": "#5b4636",
-  "rust": "#a8482a", "terracotta": "#b86145",
+  brown: "#5a3d24",
+  chocolate: "#3d2616",
+  espresso: "#3a2a22",
+  walnut: "#5b4636",
+  rust: "#a8482a",
+  terracotta: "#b86145",
   // Greys
-  "grey": "#8a8a8a", "gray": "#8a8a8a", "light grey": "#bfbfbf", "dark grey": "#4a4a4a",
-  "slate": "#5e6770", "graphite": "#383b3f", "charcoal": "#3a3a3c", "ash": "#9a9a98",
+  grey: "#8a8a8a",
+  gray: "#8a8a8a",
+  "light grey": "#bfbfbf",
+  "dark grey": "#4a4a4a",
+  slate: "#5e6770",
+  graphite: "#383b3f",
+  charcoal: "#3a3a3c",
+  ash: "#9a9a98",
   // Blacks
-  "black": "#0e0e10", "ink": "#0e0e10", "jet": "#0a0a0a",
+  black: "#0e0e10",
+  ink: "#0e0e10",
+  jet: "#0a0a0a",
   // Blues
-  "navy": "#1c2541", "deep navy": "#1f2740", "midnight": "#10172a",
-  "blue": "#2b4a8b", "sky": "#9ec3e0", "denim": "#4a6a91", "cobalt": "#1e3a8a",
+  navy: "#1c2541",
+  "deep navy": "#1f2740",
+  midnight: "#10172a",
+  blue: "#2b4a8b",
+  sky: "#9ec3e0",
+  denim: "#4a6a91",
+  cobalt: "#1e3a8a",
   // Greens
-  "green": "#3a6b3f", "olive": "#6b6a3a", "forest": "#2a4a2e", "sage": "#a3b39a",
-  "moss": "#5a6a3d", "khaki green": "#7a7a4a",
+  green: "#3a6b3f",
+  olive: "#6b6a3a",
+  forest: "#2a4a2e",
+  sage: "#a3b39a",
+  moss: "#5a6a3d",
+  "khaki green": "#7a7a4a",
   // Reds / pinks
-  "red": "#a02a2a", "burgundy": "#5a1a26", "wine": "#5e1f2a",
-  "pink": "#e7b6b6", "blush": "#e8c8c0", "rose": "#c97a7a",
+  red: "#a02a2a",
+  burgundy: "#5a1a26",
+  wine: "#5e1f2a",
+  pink: "#e7b6b6",
+  blush: "#e8c8c0",
+  rose: "#c97a7a",
   // Yellows / oranges
-  "yellow": "#e3c34a", "mustard": "#b8902a", "ochre": "#bf8a2a", "orange": "#d96a2c",
+  yellow: "#e3c34a",
+  mustard: "#b8902a",
+  ochre: "#bf8a2a",
+  orange: "#d96a2c",
   // Purples
-  "purple": "#5a3a7a", "lavender": "#bda8c9", "plum": "#5a2a4a",
+  purple: "#5a3a7a",
+  lavender: "#bda8c9",
+  plum: "#5a2a4a",
 };
 
 function swatch(name: string): string {

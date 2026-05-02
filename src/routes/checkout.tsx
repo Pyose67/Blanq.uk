@@ -38,9 +38,7 @@ function CheckoutPage() {
   return (
     <div className="mx-auto max-w-[820px] px-6 md:px-10 py-20 md:py-28">
       <p className="eyebrow mb-4">Secure checkout</p>
-      <h1 className="font-serif text-3xl md:text-4xl text-ink mb-3">
-        Opening Shopify checkout…
-      </h1>
+      <h1 className="font-serif text-3xl md:text-4xl text-ink mb-3">Opening Shopify checkout…</h1>
       <p className="text-muted-foreground leading-relaxed">
         Your secure Shopify checkout has opened in a new tab. If it did not, use the button below.
       </p>
@@ -80,7 +78,10 @@ function CheckoutPage() {
         </a>
       )}
 
-      <Link to="/" className="mt-8 ml-6 inline-block link-underline text-[11px] uppercase tracking-[0.28em]">
+      <Link
+        to="/"
+        className="mt-8 ml-6 inline-block link-underline text-[11px] uppercase tracking-[0.28em]"
+      >
         Continue browsing
       </Link>
     </div>

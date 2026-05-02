@@ -6,7 +6,8 @@
 
 @font-face {
   font-family: "Playfair Display";
-  src: url("https://fonts.gstatic.com/s/playfairdisplay/v37/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKdFvUDQ.woff2") format("woff2");
+  src: url("https://fonts.gstatic.com/s/playfairdisplay/v37/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKdFvUDQ.woff2")
+    format("woff2");
   font-weight: 300 900;
   font-style: normal;
   font-display: swap;
@@ -60,11 +61,11 @@
   --radius: 0px;
 
   /* BLANQ Quiet Luxury Palette — exact spec hex values */
-  --offwhite: #f9f8f6;       /* Alabaster — primary canvas */
-  --charcoal: #333333;       /* Charcoal — text, secondary accents */
-  --disabled: #8c8c8c;       /* Disabled grey — unselected buttons/borders */
-  --ink: #0d0d0d;            /* 95% black — active buttons, primary type */
-  --sand: #e3dac9;           /* Soft sand — texture highlights */
+  --offwhite: #f9f8f6; /* Alabaster — primary canvas */
+  --charcoal: #333333; /* Charcoal — text, secondary accents */
+  --disabled: #8c8c8c; /* Disabled grey — unselected buttons/borders */
+  --ink: #0d0d0d; /* 95% black — active buttons, primary type */
+  --sand: #e3dac9; /* Soft sand — texture highlights */
   --stone: #d8d2c3;
   --navy: #1f2740;
 
@@ -108,14 +109,22 @@
     letter-spacing: 0.005em;
   }
 
-  h1, h2, h3, h4, h5 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
     font-family: var(--font-serif);
     font-weight: 400;
     letter-spacing: -0.01em;
   }
 
-  .font-serif { font-family: var(--font-serif); }
-  .font-sans { font-family: var(--font-sans); }
+  .font-serif {
+    font-family: var(--font-serif);
+  }
+  .font-sans {
+    font-family: var(--font-sans);
+  }
 
   .eyebrow {
     font-family: var(--font-sans);
@@ -158,7 +167,13 @@
   }
 
   @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }

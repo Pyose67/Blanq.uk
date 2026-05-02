@@ -70,9 +70,7 @@ export function Header() {
 
           {/* Center — wordmark */}
           <Link to="/" className="justify-self-center" aria-label="BLANQ — home">
-            <span className="font-serif text-xl md:text-2xl tracking-[0.42em] text-ink">
-              BLANQ
-            </span>
+            <span className="font-serif text-xl md:text-2xl tracking-[0.42em] text-ink">BLANQ</span>
           </Link>
 
           {/* Right — desktop link + bag */}
@@ -147,7 +145,8 @@ export function Header() {
           <div className="px-6 py-6 border-t border-border space-y-3">
             <p className="eyebrow">Client services</p>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Complimentary delivery within the United Kingdom. Considered returns within thirty days.
+              Complimentary delivery within the United Kingdom. Considered returns within thirty
+              days.
             </p>
           </div>
         </SheetContent>

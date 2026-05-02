@@ -1,6 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { Minus, Plus, X } from "lucide-react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import { useCart, formatGBP } from "@/lib/cart";
 
 export function CartDrawer() {
@@ -94,7 +100,9 @@ export function CartDrawer() {
                             <Plus className="h-3 w-3" />
                           </button>
                         </div>
-                        <p className="text-sm tabular-nums">{formatGBP(item.price * item.quantity)}</p>
+                        <p className="text-sm tabular-nums">
+                          {formatGBP(item.price * item.quantity)}
+                        </p>
                       </div>
                     </div>
                   </li>

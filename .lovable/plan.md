@@ -26,11 +26,11 @@ This way new variants you add in Shopify with descriptive names like "Desert Tan
 
 This is informational (no code change). The data already comes from Shopify **metafields** under namespace `blanq`:
 
-| Section in site         | Metafield namespace | Metafield key     | Type           |
-|-------------------------|--------------------|-------------------|----------------|
-| Size Guide table        | `blanq`            | `size_guide`      | JSON           |
-| Material Properties     | `blanq`            | `material_props`  | JSON           |
-| Technical Notes         | `blanq`            | `tech_notes`      | JSON           |
+| Section in site     | Metafield namespace | Metafield key    | Type |
+| ------------------- | ------------------- | ---------------- | ---- |
+| Size Guide table    | `blanq`             | `size_guide`     | JSON |
+| Material Properties | `blanq`             | `material_props` | JSON |
+| Technical Notes     | `blanq`             | `tech_notes`     | JSON |
 
 **One-time setup in Shopify Admin** (you do this once per store):
 
