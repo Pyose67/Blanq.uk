@@ -27,7 +27,7 @@ export default createApp({
     plugins: [
       tsconfigPaths(),
       TanStackRouterVite({
-        routesDirectory: './app/routes',
+        routesDirectory: './src/routes',
         generatedRouteTree: './app/routeTree.gen.ts',
       }),
     ],
