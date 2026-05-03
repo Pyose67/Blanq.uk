@@ -1,12 +1,15 @@
-import { defineConfig } from '@tanstack/react-start/config'
+import { defineConfig } from 'vinxi'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 
 export default defineConfig({
   vite: {
     plugins: [
-      TanStackRouterVite({ autoCodeSplitting: true }), // <-- O HERÓI AQUI
       tsconfigPaths(),
+      TanStackRouterVite({
+        routesDirectory: './app/routes',
+        generatedRouteTree: './app/routeTree.gen.ts',
+      }),
     ],
   },
 })
