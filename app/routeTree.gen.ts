@@ -10,27 +10,49 @@
 // You should NOT make any changes in this file as it will be overwritten.
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as IndexImport } from './routes/index'
 
-export interface FileRoutesByPath {}
+const IndexRoute = IndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
 
-export interface FileRoutesByTo {}
+export interface FileRoutesByPath {
+  '/': {
+    id: '/'
+    path: '/'
+    fullPath: '/'
+    preLoaderRoute: typeof IndexImport
+    parentRoute: typeof rootRoute
+  }
+}
+
+export interface FileRoutesByTo {
+  '/': FileRoutesByPath['/']
+}
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
+  '/': typeof IndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByPath
-  fullPaths: never
+  fullPaths: '/'
   fileRoutesByTo: FileRoutesByTo
-  to: never
-  id: '__root__'
+  to: '/'
+  id: '__root__' | '/'
   fileRoutesById: FileRoutesById
 }
 
-export interface RootRouteChildren {}
+export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
+}
 
-const rootRouteChildren: RootRouteChildren = {}
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+}
 
 export const routeTree = rootRoute._addFileChildren(rootRouteChildren)
 
