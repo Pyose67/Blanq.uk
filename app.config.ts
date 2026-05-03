@@ -1,4 +1,4 @@
-import { defineConfig } from 'vinxi/config'
+import { defineConfig } from 'vinxi'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
