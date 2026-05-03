@@ -1,6 +1,7 @@
 import { createApp } from 'vinxi'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
+import path from 'path'
 
 export default createApp({
   routers: [
@@ -31,5 +32,10 @@ export default createApp({
         generatedRouteTree: './app/routeTree.gen.ts',
       }),
     ],
+    resolve: {
+      alias: {
+        '@': path.resolve('./src'),
+      },
+    },
   },
 })
