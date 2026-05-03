@@ -427,8 +427,8 @@ function SizeGuideDialog({ product }: { product: ShopifyProduct }) {
                 {rows.map((r, rowIndex) => (
                   <tr key={rowIndex}>
                     {Object.keys(rows[0]).map((col, colIndex) => (
-                      <td 
-                        key={colIndex} 
+                      <td
+                        key={colIndex}
                         className={`py-3 ${colIndex === 0 ? "font-serif text-ink" : "tabular-nums"}`}
                       >
                         {/* O 'as any' abaixo é o que resolve o chilique do TypeScript */}
