@@ -6,11 +6,12 @@ export default defineEventHandler(async () => {
 
   const assetTags = assets
     .map((asset: any) => {
-      if (asset.tag === 'script') {
-        return `<script type="module" src="${asset.attrs.src}"></script>`
+      const href = asset.attrs?.href || asset.attrs?.src || ''
+      if (href.endsWith('.js')) {
+        return `<script type="module" src="${href}"></script>`
       }
-      if (asset.tag === 'link') {
-        return `<link rel="stylesheet" href="${asset.attrs.href}" />`
+      if (href.endsWith('.css')) {
+        return `<link rel="stylesheet" href="${href}" />`
       }
       return ''
     })
