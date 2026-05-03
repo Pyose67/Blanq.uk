@@ -25,4 +25,11 @@ if (fs.existsSync(generatedWrangler)) {
   fs.rmSync(generatedWrangler);
 }
 
+// Remove the .wrangler folder that has a deploy/config.json pointing to the
+// removed wrangler.json — without this, Cloudflare Pages fails reading config
+if (fs.existsSync(".wrangler")) {
+  fs.rmSync(".wrangler", { recursive: true, force: true });
+}
+
 console.log("✓ _worker.js criado em dist/client/");
+console.log("✓ .wrangler removido");
