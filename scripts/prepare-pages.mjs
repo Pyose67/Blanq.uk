@@ -17,15 +17,13 @@ if (fs.existsSync(serverAssetsDir)) {
 
 let serverCode = fs.readFileSync(path.join(serverDir, "server.js"), "utf8");
 
+// Capture native fetch BEFORE any framework patches it
 const wrapper = `
 const _tsrFetch = server.fetch.bind(server);
+const _nativeFetch = globalThis.fetch.bind(globalThis);
 
 function _parsePathAndQuery(reqUrl) {
-  // Extract path and query without using new URL().
-  // reqUrl is typically a full URL like "https://blanq.uk/api/reviews?x=1"
-  // but can also be a path like "/api/reviews?x=1".
   let s = String(reqUrl || "");
-  // Strip protocol+host if present
   const protoIdx = s.indexOf("://");
   if (protoIdx !== -1) {
     const afterProto = s.slice(protoIdx + 3);
@@ -40,24 +38,25 @@ function _parsePathAndQuery(reqUrl) {
 }
 
 async function _judgemeProxy(request, env) {
-  const { params: queryParams } = _parsePathAndQuery(request.url);
-  const productId = queryParams.get("product_id");
-  const perPage = queryParams.get("per_page") || "100";
-  if (!productId) {
-    return new Response(JSON.stringify({ error: "product_id required" }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-  const params = new URLSearchParams({
-    api_token: env.JUDGEME_PRIVATE_TOKEN || "",
-    shop_domain: env.JUDGEME_SHOP_DOMAIN || "",
-    external_id: productId,
-    per_page: perPage,
-  });
-  const apiUrl = "https://judge.me/api/v1/reviews?" + params.toString();
   try {
-    const res = await fetch(apiUrl);
+    const { params: queryParams } = _parsePathAndQuery(request.url);
+    const productId = queryParams.get("product_id");
+    const perPage = queryParams.get("per_page") || "100";
+    if (!productId) {
+      return new Response(JSON.stringify({ error: "product_id required" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    const params = new URLSearchParams({
+      api_token: env.JUDGEME_PRIVATE_TOKEN || "",
+      shop_domain: env.JUDGEME_SHOP_DOMAIN || "",
+      external_id: productId,
+      per_page: perPage,
+    });
+    const apiUrl = "https://judge.me/api/v1/reviews?" + params.toString();
+
+    const res = await _nativeFetch(apiUrl);
     if (!res.ok) {
       const errorText = await res.text();
       return new Response(JSON.stringify({ debug: "judgeme_not_ok", status: res.status, body: errorText.slice(0, 500) }), {
@@ -74,7 +73,7 @@ async function _judgemeProxy(request, env) {
       },
     });
   } catch (err) {
-    return new Response(JSON.stringify({ debug: "exception", message: String(err), stack: err && err.stack ? String(err.stack).slice(0, 1000) : null, hasToken: !!env.JUDGEME_PRIVATE_TOKEN, hasShop: !!env.JUDGEME_SHOP_DOMAIN }), {
+    return new Response(JSON.stringify({ debug: "exception", message: String(err), stack: err && err.stack ? String(err.stack).slice(0, 1500) : null, hasToken: !!env.JUDGEME_PRIVATE_TOKEN, hasShop: !!env.JUDGEME_SHOP_DOMAIN }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
@@ -82,22 +81,29 @@ async function _judgemeProxy(request, env) {
 }
 
 const _assetAwareFetch = async (request, env, ctx) => {
-  const { pathname: p } = _parsePathAndQuery(request.url);
+  try {
+    const { pathname: p } = _parsePathAndQuery(request.url);
 
-  if (p === "/api/reviews") {
-    return _judgemeProxy(request, env);
+    if (p === "/api/reviews") {
+      return await _judgemeProxy(request, env);
+    }
+
+    const isStatic =
+      p.startsWith("/assets/") ||
+      p === "/favicon.png" ||
+      /\\.(?:css|js|ico|png|jpg|jpeg|gif|svg|webp|woff2?|ttf|otf)(\\?.*)?$/.test(p);
+    if (isStatic && env?.ASSETS) {
+      const res = await env.ASSETS.fetch(request);
+      if (res.status !== 404) return res;
+    }
+
+    return _tsrFetch(request, env, ctx);
+  } catch (err) {
+    return new Response(JSON.stringify({ debug: "outer_exception", message: String(err), stack: err && err.stack ? String(err.stack).slice(0, 1500) : null }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
-
-  const isStatic =
-    p.startsWith("/assets/") ||
-    p === "/favicon.png" ||
-    /\\.(?:css|js|ico|png|jpg|jpeg|gif|svg|webp|woff2?|ttf|otf)(\\?.*)?$/.test(p);
-  if (isStatic && env?.ASSETS) {
-    const res = await env.ASSETS.fetch(request);
-    if (res.status !== 404) return res;
-  }
-
-  return _tsrFetch(request, env, ctx);
 };
 
 export { createServerEntry, _assetAwareFetch as fetch };
