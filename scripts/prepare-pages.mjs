@@ -41,7 +41,8 @@ async function _judgemeProxy(request, env) {
   try {
     const res = await fetch(apiUrl.toString());
     if (!res.ok) {
-      return new Response(JSON.stringify({ reviews: [] }), {
+      const errorText = await res.text();
+      return new Response(JSON.stringify({ debug: "judgeme_not_ok", status: res.status, body: errorText, url: apiUrl.toString().replace(env.JUDGEME_PRIVATE_TOKEN, "REDACTED") }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
       });
@@ -57,7 +58,12 @@ async function _judgemeProxy(request, env) {
   } catch {
     return new Response(JSON.stringify({ reviews: [] }), {
       status: 200,
+      headers: { "Content-Type": "application/json" },} catch (err) {
+    return new Response(JSON.stringify({ debug: "exception", message: String(err), shop: env.JUDGEME_SHOP_DOMAIN, hasToken: !!env.JUDGEME_PRIVATE_TOKEN }), {
+      status: 200,
       headers: { "Content-Type": "application/json" },
+    });
+  }
     });
   }
 }
