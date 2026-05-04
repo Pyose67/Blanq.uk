@@ -20,18 +20,29 @@ let serverCode = fs.readFileSync(path.join(serverDir, "server.js"), "utf8");
 const wrapper = `
 const _tsrFetch = server.fetch.bind(server);
 
-function _safeUrl(reqUrl) {
-  try {
-    return new URL(reqUrl);
-  } catch {
-    return new URL(reqUrl, "https://placeholder.local");
+function _parsePathAndQuery(reqUrl) {
+  // Extract path and query without using new URL().
+  // reqUrl is typically a full URL like "https://blanq.uk/api/reviews?x=1"
+  // but can also be a path like "/api/reviews?x=1".
+  let s = String(reqUrl || "");
+  // Strip protocol+host if present
+  const protoIdx = s.indexOf("://");
+  if (protoIdx !== -1) {
+    const afterProto = s.slice(protoIdx + 3);
+    const slashIdx = afterProto.indexOf("/");
+    s = slashIdx === -1 ? "/" : afterProto.slice(slashIdx);
   }
+  const qIdx = s.indexOf("?");
+  const pathname = qIdx === -1 ? s : s.slice(0, qIdx);
+  const queryString = qIdx === -1 ? "" : s.slice(qIdx + 1);
+  const params = new URLSearchParams(queryString);
+  return { pathname, params };
 }
 
 async function _judgemeProxy(request, env) {
-  const url = _safeUrl(request.url);
-  const productId = url.searchParams.get("product_id");
-  const perPage = url.searchParams.get("per_page") ?? "100";
+  const { params: queryParams } = _parsePathAndQuery(request.url);
+  const productId = queryParams.get("product_id");
+  const perPage = queryParams.get("per_page") || "100";
   if (!productId) {
     return new Response(JSON.stringify({ error: "product_id required" }), {
       status: 400,
@@ -39,8 +50,8 @@ async function _judgemeProxy(request, env) {
     });
   }
   const params = new URLSearchParams({
-    api_token: env.JUDGEME_PRIVATE_TOKEN,
-    shop_domain: env.JUDGEME_SHOP_DOMAIN,
+    api_token: env.JUDGEME_PRIVATE_TOKEN || "",
+    shop_domain: env.JUDGEME_SHOP_DOMAIN || "",
     external_id: productId,
     per_page: perPage,
   });
@@ -49,7 +60,7 @@ async function _judgemeProxy(request, env) {
     const res = await fetch(apiUrl);
     if (!res.ok) {
       const errorText = await res.text();
-      return new Response(JSON.stringify({ debug: "judgeme_not_ok", status: res.status, body: errorText, url: apiUrl.replace(env.JUDGEME_PRIVATE_TOKEN, "REDACTED") }), {
+      return new Response(JSON.stringify({ debug: "judgeme_not_ok", status: res.status, body: errorText.slice(0, 500) }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
       });
@@ -63,7 +74,7 @@ async function _judgemeProxy(request, env) {
       },
     });
   } catch (err) {
-    return new Response(JSON.stringify({ debug: "exception", message: String(err), stack: err && err.stack ? String(err.stack) : null, shop: env.JUDGEME_SHOP_DOMAIN, hasToken: !!env.JUDGEME_PRIVATE_TOKEN }), {
+    return new Response(JSON.stringify({ debug: "exception", message: String(err), stack: err && err.stack ? String(err.stack).slice(0, 1000) : null, hasToken: !!env.JUDGEME_PRIVATE_TOKEN, hasShop: !!env.JUDGEME_SHOP_DOMAIN }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
@@ -71,7 +82,7 @@ async function _judgemeProxy(request, env) {
 }
 
 const _assetAwareFetch = async (request, env, ctx) => {
-  const p = _safeUrl(request.url).pathname;
+  const { pathname: p } = _parsePathAndQuery(request.url);
 
   if (p === "/api/reviews") {
     return _judgemeProxy(request, env);
