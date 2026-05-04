@@ -357,7 +357,6 @@ export async function getShopPolicies(): Promise<ShopPolicies> {
 export const JUDGEME_PUBLIC_TOKEN: string = 
   (import.meta as any).env?.VITE_JUDGEME_PUBLIC_TOKEN ?? "WIJ613R7E9nEF_-Rr8nGHA6LBRQ";
 export const JUDGEME_SHOP_DOMAIN: string = SHOPIFY_STORE_PERMANENT_DOMAIN;
-const JUDGEME_API = "https://judge.me/api/v1";
 
 // Convert Shopify GraphQL gid (e.g. gid://shopify/Product/12345) to numeric ID.
 function gidToNumericId(gid: string): string {
@@ -378,10 +377,13 @@ interface JudgemeReview {
 export async function getProductReviews(productId: string): Promise<ProductReviewsSummary> {
   const numericId = gidToNumericId(productId);
   try {
-    const url = `${JUDGEME_API}/reviews?api_token=${encodeURIComponent(JUDGEME_PUBLIC_TOKEN)}&shop_domain=${encodeURIComponent(JUDGEME_SHOP_DOMAIN)}&product_id=${encodeURIComponent(numericId)}&per_page=100`;
+    // Chama o proxy interno (Cloudflare Pages Function) que usa o token privado.
+    // Em dev, o Vite não tem este endpoint — retorna vazio silenciosamente.
+    const url = `/api/reviews?product_id=${encodeURIComponent(numericId)}&per_page=100`;
     const res = await fetch(url);
     if (!res.ok) return { average: 0, count: 0, reviews: [] };
     const json: { reviews?: JudgemeReview[] } = await res.json();
+
     const reviews: ProductReview[] = (json.reviews ?? []).map((r) => ({
       id: String(r.id),
       author: r.reviewer?.name?.trim() || "Anonymous",
