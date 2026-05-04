@@ -33,16 +33,18 @@ async function _judgemeProxy(request, env) {
       headers: { "Content-Type": "application/json" },
     });
   }
-  const apiUrl = new URL("https://judge.me/api/v1/reviews");
-  apiUrl.searchParams.set("api_token", env.JUDGEME_PRIVATE_TOKEN);
-  apiUrl.searchParams.set("shop_domain", env.JUDGEME_SHOP_DOMAIN);
-  apiUrl.searchParams.set("external_id", productId);
-  apiUrl.searchParams.set("per_page", perPage);
+  const params = new URLSearchParams({
+    api_token: env.JUDGEME_PRIVATE_TOKEN,
+    shop_domain: env.JUDGEME_SHOP_DOMAIN,
+    external_id: productId,
+    per_page: perPage,
+  });
+  const apiUrl = "https://judge.me/api/v1/reviews?" + params.toString();
   try {
-    const res = await fetch(apiUrl.toString());
+    const res = await fetch(apiUrl);
     if (!res.ok) {
       const errorText = await res.text();
-      return new Response(JSON.stringify({ debug: "judgeme_not_ok", status: res.status, body: errorText, url: apiUrl.toString().replace(env.JUDGEME_PRIVATE_TOKEN, "REDACTED") }), {
+      return new Response(JSON.stringify({ debug: "judgeme_not_ok", status: res.status, body: errorText, url: apiUrl.replace(env.JUDGEME_PRIVATE_TOKEN, "REDACTED") }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
       });
