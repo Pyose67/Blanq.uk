@@ -5,6 +5,7 @@ const serverDir = "dist/server";
 const clientDir = "dist/client";
 const clientAssetsDir = path.join(clientDir, "assets");
 
+// Merge server assets into client/assets (dynamic imports need them there)
 const serverAssetsDir = path.join(serverDir, "assets");
 if (fs.existsSync(serverAssetsDir)) {
   for (const file of fs.readdirSync(serverAssetsDir)) {
@@ -17,7 +18,7 @@ if (fs.existsSync(serverAssetsDir)) {
 
 let serverCode = fs.readFileSync(path.join(serverDir, "server.js"), "utf8");
 
-// Capture native fetch BEFORE any framework patches it
+// Wrap fetch with: 1) /api/reviews proxy to Judge.me, 2) static assets, 3) SSR
 const wrapper = `
 const _tsrFetch = server.fetch.bind(server);
 const _nativeFetch = globalThis.fetch.bind(globalThis);
@@ -58,8 +59,7 @@ async function _judgemeProxy(request, env) {
 
     const res = await _nativeFetch(apiUrl);
     if (!res.ok) {
-      const errorText = await res.text();
-      return new Response(JSON.stringify({ debug: "judgeme_not_ok", status: res.status, body: errorText.slice(0, 500) }), {
+      return new Response(JSON.stringify({ reviews: [] }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
       });
@@ -72,8 +72,8 @@ async function _judgemeProxy(request, env) {
         "Cache-Control": "public, max-age=300, s-maxage=300",
       },
     });
-  } catch (err) {
-    return new Response(JSON.stringify({ debug: "exception", message: String(err), stack: err && err.stack ? String(err.stack).slice(0, 1500) : null, hasToken: !!env.JUDGEME_PRIVATE_TOKEN, hasShop: !!env.JUDGEME_SHOP_DOMAIN }), {
+  } catch {
+    return new Response(JSON.stringify({ reviews: [] }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
@@ -99,10 +99,7 @@ const _assetAwareFetch = async (request, env, ctx) => {
 
     return _tsrFetch(request, env, ctx);
   } catch (err) {
-    return new Response(JSON.stringify({ debug: "outer_exception", message: String(err), stack: err && err.stack ? String(err.stack).slice(0, 1500) : null }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response("Internal Server Error", { status: 500 });
   }
 };
 
