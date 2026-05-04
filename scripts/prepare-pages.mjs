@@ -55,15 +55,10 @@ async function _judgemeProxy(request, env) {
         "Cache-Control": "public, max-age=300, s-maxage=300",
       },
     });
-  } catch {
-    return new Response(JSON.stringify({ reviews: [] }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },} catch (err) {
+  } catch (err) {
     return new Response(JSON.stringify({ debug: "exception", message: String(err), shop: env.JUDGEME_SHOP_DOMAIN, hasToken: !!env.JUDGEME_PRIVATE_TOKEN }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
-    });
-  }
     });
   }
 }
