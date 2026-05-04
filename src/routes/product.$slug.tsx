@@ -454,7 +454,7 @@ function SizeGuideDialog({ product }: { product: ShopifyProduct }) {
 // =====================================================================
 
 function ReviewsSection({ productId }: { productId: string }) {
-  const [data, setData] = useState<ProductReviewsSummary | null>(null);
+  const [data, setData] = useState<ProductReviewsSummary | undefined>(undefined);
   const [open, setOpen] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [author, setAuthor] = useState("");
@@ -466,7 +466,7 @@ function ReviewsSection({ productId }: { productId: string }) {
   useEffect(() => {
     getProductReviews(productId)
       .then(setData)
-      .catch(() => setData(null));
+      .catch(() => setData({ average: 0, count: 0, reviews: [] }));
   }, [productId]);
 
   async function submit(e: React.FormEvent) {
@@ -482,7 +482,14 @@ function ReviewsSection({ productId }: { productId: string }) {
     setShowForm(false);
   }
 
-  if (!data) return null;
+  if (data === undefined) {
+    return (
+      <section className="mx-auto max-w-[1480px] px-5 md:px-10 py-20 md:py-32">
+        <div className="h-4 w-28 bg-muted animate-pulse rounded mb-4" />
+        <div className="h-3 w-20 bg-muted animate-pulse rounded" />
+      </section>
+    );
+  }
   const visible = open ? data.reviews : data.reviews.slice(0, 2);
   const hasReviews = data.count > 0;
 

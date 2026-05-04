@@ -354,7 +354,7 @@ export async function getShopPolicies(): Promise<ShopPolicies> {
 
 // Public Judge.me token — safe to expose in client code (read-only).
 // Override with VITE_JUDGEME_PUBLIC_TOKEN at build time if needed.
-export const JUDGEME_PUBLIC_TOKEN: string =
+export const JUDGEME_PUBLIC_TOKEN: string = 
   (import.meta as any).env?.VITE_JUDGEME_PUBLIC_TOKEN ?? "WIJ613R7E9nEF_-Rr8nGHA6LBRQ";
 export const JUDGEME_SHOP_DOMAIN: string = SHOPIFY_STORE_PERMANENT_DOMAIN;
 const JUDGEME_API = "https://judge.me/api/v1";
