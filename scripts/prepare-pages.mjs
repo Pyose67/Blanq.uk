@@ -36,7 +36,7 @@ async function _judgemeProxy(request, env) {
   const apiUrl = new URL("https://judge.me/api/v1/reviews");
   apiUrl.searchParams.set("api_token", env.JUDGEME_PRIVATE_TOKEN);
   apiUrl.searchParams.set("shop_domain", env.JUDGEME_SHOP_DOMAIN);
-  apiUrl.searchParams.set("product_id", productId);
+  apiUrl.searchParams.set("external_id", productId);
   apiUrl.searchParams.set("per_page", perPage);
   try {
     const res = await fetch(apiUrl.toString());
