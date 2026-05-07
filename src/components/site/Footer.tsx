@@ -14,6 +14,15 @@ function PinterestIcon({ className }: { className?: string }) {
 
 export function Footer() {
   const [policies, setPolicies] = useState<ShopPolicies | null>(null);
+  const [emailCopied, setEmailCopied] = useState(false);
+
+  function handleEmailClick(e: React.MouseEvent<HTMLAnchorElement>) {
+    navigator.clipboard?.writeText(siteConfig.contact.email).then(() => {
+      setEmailCopied(true);
+      setTimeout(() => setEmailCopied(false), 2000);
+    });
+    // deixa o mailto: continuar normalmente — quem tem cliente de email abre-o
+  }
 
   useEffect(() => {
     getShopPolicies()
@@ -132,7 +141,20 @@ export function Footer() {
                   <Facebook className="h-4 w-4" strokeWidth={1.4} /> Facebook
                 </a>
               </li>
-              <li className="text-muted-foreground pt-2 break-all">{siteConfig.contact.email}</li>
+              <li className="pt-2 relative">
+                <a
+                  href={`mailto:${siteConfig.contact.email}`}
+                  onClick={handleEmailClick}
+                  className="text-muted-foreground break-all link-underline"
+                >
+                  {siteConfig.contact.email}
+                </a>
+                {emailCopied && (
+                  <span className="absolute -top-6 left-0 text-[10px] uppercase tracking-[0.18em] text-foreground/60">
+                    Copied
+                  </span>
+                )}
+              </li>
             </ul>
           </div>
         </div>
