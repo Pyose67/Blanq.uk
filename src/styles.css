@@ -176,4 +176,54 @@
       transform: translateY(0);
     }
   }
+
+  /* ── Scroll-reveal via IntersectionObserver ───────── */
+  /* Começa invisible; JS adiciona .is-visible quando entra na viewport */
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition:
+      opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .reveal-subtle {
+    opacity: 0;
+    transform: translateY(10px);
+    transition:
+      opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .stagger-grid > * {
+    opacity: 0;
+    transform: translateY(22px);
+    transition:
+      opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Stagger delay por coluna */
+  .stagger-grid > *:nth-child(3n + 2) { transition-delay: 90ms; }
+  .stagger-grid > *:nth-child(3n + 3) { transition-delay: 180ms; }
+
+  /* Estado visível — adicionado pelo IntersectionObserver */
+  .reveal.is-visible,
+  .reveal-subtle.is-visible,
+  .stagger-grid > *.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── Transições globais suaves ─────────────────────── */
+  img {
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Header sombra ao scroll */
+  .header-scrolled {
+    box-shadow: 0 1px 0 0 var(--border), 0 4px 16px -4px rgba(0, 0, 0, 0.06);
+    transition: box-shadow 0.4s ease;
+  }
 }

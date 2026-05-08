@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { Menu, ShoppingBag, X } from "lucide-react";
 import {
@@ -26,9 +26,16 @@ const mobileNav = [
 export function Header() {
   const { count, openCart } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-40 bg-background/90 backdrop-blur-md border-b border-border">
+    <header className={`sticky top-0 z-40 bg-background/90 backdrop-blur-md border-b border-border transition-shadow duration-400 ${scrolled ? "header-scrolled" : ""}`}>
       <div className="mx-auto max-w-[1480px] px-5 md:px-10">
         <div className="grid grid-cols-3 items-center h-16 md:h-20">
           {/* Left — hamburger (mobile) / nav (desktop) */}

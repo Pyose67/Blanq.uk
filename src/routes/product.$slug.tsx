@@ -104,7 +104,7 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
   return (
     <>
       {/* Breadcrumbs */}
-      <div className="mx-auto max-w-[1480px] px-5 md:px-10 pt-6 md:pt-8">
+      <div className="mx-auto max-w-[1480px] px-5 md:px-10 pt-6 md:pt-8 fade-in-up">
         <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
           <Link to="/" className="link-underline">
             Home
@@ -120,7 +120,7 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
       <section className="mx-auto max-w-[1480px] px-5 md:px-10 py-8 md:py-12">
         <div className="grid md:grid-cols-2 gap-8 md:gap-16">
           {/* Gallery */}
-          <div className="space-y-4">
+          <div className="space-y-4 fade-in-up [animation-delay:100ms]">
             <div className="aspect-[4/5] bg-muted overflow-hidden">
               <img
                 src={product.images[activeImage].url}
@@ -146,7 +146,7 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
           </div>
 
           {/* Buybox */}
-          <div className="md:sticky md:top-28 self-start">
+          <div className="md:sticky md:top-28 self-start fade-in-up [animation-delay:220ms]">
             <p className="eyebrow mb-3">{product.productType}</p>
             <h1 className="font-serif text-4xl md:text-5xl leading-[1.05] tracking-tight text-ink">
               {product.title}
@@ -302,13 +302,13 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
       <section className="bg-sand/40 py-24 md:py-32 mt-16">
         <div className="mx-auto max-w-[1480px] px-5 md:px-10">
           <div className="grid md:grid-cols-12 gap-10 mb-12">
-            <p className="md:col-span-3 eyebrow">The BLANQ Standard</p>
-            <h2 className="md:col-span-8 md:col-start-5 font-serif text-3xl md:text-5xl leading-[1.15] text-ink">
+            <p className="md:col-span-3 eyebrow reveal-subtle">The BLANQ Standard</p>
+            <h2 className="md:col-span-8 md:col-start-5 font-serif text-3xl md:text-5xl leading-[1.15] text-ink reveal">
               An obsession with the material itself.
             </h2>
           </div>
           <div className="grid md:grid-cols-2 gap-12 md:gap-20 max-w-5xl md:ml-[calc(25%_-_2.5rem)]">
-            <div>
+            <div className="reveal">
               <p className="text-foreground/85 leading-[1.8] text-[15px]">
                 We do not use synthetic blends. The garments are drawn from a small set of natural
                 fibres — Australian Merino at 17.9 microns, long-staple Pima cotton, Italian
@@ -316,7 +316,7 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
                 the design.
               </p>
             </div>
-            <div>
+            <div className="reveal">
               <p className="text-foreground/85 leading-[1.8] text-[15px]">
                 Each material is traced from origin: a wool station in New South Wales, a spinning
                 mill in Biella, a tailoring house in Naples. We work directly with the people who
@@ -334,7 +334,7 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
       {related.length > 0 && (
         <section className="mx-auto max-w-[1480px] px-5 md:px-10 pb-20 md:pb-28">
           <div className="hairline mb-10" />
-          <div className="flex items-end justify-between mb-8 md:mb-12 gap-6">
+          <div className="flex items-end justify-between mb-8 md:mb-12 gap-6 reveal">
             <div>
               <p className="eyebrow mb-2">You may also consider</p>
               <h2 className="font-serif text-2xl md:text-3xl text-ink">Related pieces</h2>
@@ -346,7 +346,7 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
               View all
             </Link>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-12 md:gap-x-8 md:gap-y-16">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-12 md:gap-x-8 md:gap-y-16 stagger-grid">
             {related.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
@@ -464,9 +464,18 @@ function ReviewsSection({ productId }: { productId: string }) {
   const [body, setBody] = useState("");
 
   useEffect(() => {
+    let cancelled = false;
+    setData(undefined);
     getProductReviews(productId)
-      .then(setData)
-      .catch(() => setData({ average: 0, count: 0, reviews: [] }));
+      .then((d) => {
+        if (!cancelled) setData(d);
+      })
+      .catch(() => {
+        if (!cancelled) setData({ average: 0, count: 0, reviews: [] });
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [productId]);
 
   async function submit(e: React.FormEvent) {

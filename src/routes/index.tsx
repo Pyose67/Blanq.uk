@@ -89,8 +89,8 @@ function Home() {
       {/* INTRO STATEMENT */}
       <section className="mx-auto max-w-[1480px] px-6 md:px-10 py-32 md:py-40">
         <div className="grid md:grid-cols-12 gap-10">
-          <p className="md:col-span-3 eyebrow">A House Note</p>
-          <div className="md:col-span-8 md:col-start-5">
+          <p className="md:col-span-3 eyebrow reveal-subtle">A House Note</p>
+          <div className="md:col-span-8 md:col-start-5 reveal">
             <p className="font-serif text-2xl md:text-4xl leading-[1.35] text-foreground">
               We do not produce trends. We produce a small number of garments, considered slowly, in
               materials that justify the time given to them.
@@ -102,7 +102,7 @@ function Home() {
       {/* MERINO SERIES */}
       <section className="bg-secondary/40 py-28 md:py-36">
         <div className="mx-auto max-w-[1480px] px-6 md:px-10">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 reveal">
             <div>
               <p className="eyebrow mb-4">Series I</p>
               <h2 className="font-serif text-4xl md:text-5xl">The Merino Series</h2>
@@ -119,7 +119,7 @@ function Home() {
             </Link>
           </div>
           <div className="grid md:grid-cols-2 gap-10 md:gap-16">
-            <div className="aspect-[4/5] overflow-hidden">
+            <div className="aspect-[4/5] overflow-hidden reveal">
               <img
                 src={fabricImg}
                 alt="Macro of merino weave"
@@ -129,7 +129,7 @@ function Home() {
                 className="h-full w-full object-cover"
               />
             </div>
-            <div className="flex flex-col justify-center">
+            <div className="flex flex-col justify-center reveal">
               <p className="eyebrow mb-6">17.9 µm Australian Merino</p>
               <h3 className="font-serif text-3xl md:text-4xl leading-tight mb-6">
                 A single fibre, finished in Biella.
@@ -163,7 +163,7 @@ function Home() {
 
       {/* CORE COLLECTION */}
       <section className="mx-auto max-w-[1480px] px-6 md:px-10 py-28 md:py-36">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 reveal">
           <div>
             <p className="eyebrow mb-4">Series II</p>
             <h2 className="font-serif text-4xl md:text-5xl">The Core Collection</h2>
@@ -184,7 +184,7 @@ function Home() {
         ) : featured.length === 0 ? (
           <EmptyState />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 md:gap-x-12 gap-y-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 md:gap-x-12 gap-y-16 stagger-grid">
             {featured.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
@@ -207,7 +207,7 @@ function Home() {
             <div className="md:col-span-3">
               <p className="eyebrow text-offwhite/60">The Philosophy</p>
             </div>
-            <div className="md:col-span-8 md:col-start-5">
+            <div className="md:col-span-8 md:col-start-5 reveal">
               <h2 className="font-serif text-3xl md:text-5xl leading-[1.2] text-offwhite">
                 Global to global. We travel to the source — a wool station in New South Wales, a
                 cotton mill in Porto, a tailoring house in Naples — and we work directly with the
@@ -233,7 +233,7 @@ function Home() {
 
       {/* NEW ARRIVALS */}
       <section className="mx-auto max-w-[1480px] px-6 md:px-10 py-28 md:py-36">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 reveal">
           <div>
             <p className="eyebrow mb-4">Recent</p>
             <h2 className="font-serif text-4xl md:text-5xl">New Arrivals</h2>
@@ -251,7 +251,7 @@ function Home() {
         ) : others.length === 0 && featured.length === 0 ? (
           <EmptyState />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16 stagger-grid">
             {(others.length ? others : featured).slice(0, 4).map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
@@ -263,7 +263,7 @@ function Home() {
       <section className="border-t border-border">
         <div className="mx-auto max-w-[1480px] px-6 md:px-10 py-28 md:py-36">
           <div className="grid md:grid-cols-12 gap-10 items-end">
-            <div className="md:col-span-7">
+            <div className="md:col-span-7 reveal">
               <p className="eyebrow mb-6">The Private List</p>
               <h2 className="font-serif text-3xl md:text-5xl leading-tight max-w-xl">
                 A quiet correspondence. Notes on new pieces, materials, and provenance — sent
@@ -272,7 +272,7 @@ function Home() {
             </div>
             <form
               onSubmit={(e) => e.preventDefault()}
-              className="md:col-span-5 flex items-end gap-4 border-b border-foreground pb-3"
+              className="md:col-span-5 flex items-end gap-4 border-b border-foreground pb-3 reveal"
             >
               <input
                 type="email"

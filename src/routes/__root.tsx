@@ -1,4 +1,5 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { CartProvider, useCartSync } from "@/lib/cart";
@@ -87,8 +88,67 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+function useScrollReveal() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  useEffect(() => {
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("is-visible");
+            io.unobserve(e.target);
+          }
+        }),
+      { threshold: 0.08, rootMargin: "0px 0px -30px 0px" },
+    );
+
+    function observeEl(el: Element) {
+      if (el.classList.contains("is-visible")) return;
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight) {
+        el.classList.add("is-visible");
+      } else {
+        io.observe(el);
+      }
+    }
+
+    function scan() {
+      document.querySelectorAll(".reveal, .reveal-subtle, .stagger-grid > *").forEach(observeEl);
+    }
+
+    // MutationObserver catches elements added after async data loads
+    // (product grids in collections/home that render after useEffect fetches complete)
+    const mo = new MutationObserver((mutations) => {
+      for (const mut of mutations) {
+        mut.addedNodes.forEach((node) => {
+          if (!(node instanceof Element)) return;
+          if (
+            node.matches(".reveal, .reveal-subtle") ||
+            node.parentElement?.classList.contains("stagger-grid")
+          ) {
+            observeEl(node);
+          }
+          node.querySelectorAll(".reveal, .reveal-subtle, .stagger-grid > *").forEach(observeEl);
+        });
+      }
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+
+    const raf = requestAnimationFrame(scan);
+    const t = setTimeout(scan, 150);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(t);
+      io.disconnect();
+      mo.disconnect();
+    };
+  }, [pathname]);
+}
+
 function RootComponent() {
   useCartSync();
+  useScrollReveal();
   return (
     <CartProvider>
       <div className="min-h-screen flex flex-col">

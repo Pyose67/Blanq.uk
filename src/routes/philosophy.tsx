@@ -25,16 +25,16 @@ function PhilosophyPage() {
   return (
     <>
       <section className="mx-auto max-w-[1480px] px-6 md:px-10 pt-24 md:pt-32 pb-20 md:pb-28">
-        <p className="eyebrow mb-8">The Philosophy</p>
-        <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl leading-[1.02] max-w-5xl tracking-tight">
+        <p className="eyebrow mb-8 reveal-subtle">The Philosophy</p>
+        <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl leading-[1.02] max-w-5xl tracking-tight reveal">
           Less, but considered absolutely.
         </h1>
       </section>
 
       <section className="mx-auto max-w-[1480px] px-6 md:px-10 pb-24">
         <div className="grid md:grid-cols-12 gap-10 md:gap-16 items-start">
-          <p className="md:col-span-3 eyebrow md:sticky md:top-28">I — Material</p>
-          <div className="md:col-span-8 md:col-start-5 space-y-8">
+          <p className="md:col-span-3 eyebrow md:sticky md:top-28 reveal-subtle">I — Material</p>
+          <div className="md:col-span-8 md:col-start-5 space-y-8 reveal">
             <p className="font-serif text-2xl md:text-3xl leading-[1.4] text-foreground">
               We begin with the fibre. Not the silhouette, not the season. The fibre.
             </p>
@@ -54,7 +54,7 @@ function PhilosophyPage() {
         </div>
       </section>
 
-      <div className="aspect-[16/9] md:aspect-[21/9] overflow-hidden">
+      <div className="aspect-[16/9] md:aspect-[21/9] overflow-hidden reveal">
         <img
           src={fabricImg}
           alt=""
@@ -67,8 +67,8 @@ function PhilosophyPage() {
 
       <section className="mx-auto max-w-[1480px] px-6 md:px-10 py-24 md:py-32">
         <div className="grid md:grid-cols-12 gap-10 md:gap-16 items-start">
-          <p className="md:col-span-3 eyebrow md:sticky md:top-28">II — Provenance</p>
-          <div className="md:col-span-8 md:col-start-5 space-y-8">
+          <p className="md:col-span-3 eyebrow md:sticky md:top-28 reveal-subtle">II — Provenance</p>
+          <div className="md:col-span-8 md:col-start-5 space-y-8 reveal">
             <p className="font-serif text-2xl md:text-3xl leading-[1.4] text-foreground">
               Global to global. We travel to the source.
             </p>
@@ -98,8 +98,8 @@ function PhilosophyPage() {
         />
         <div className="relative mx-auto max-w-[1480px] px-6 md:px-10">
           <div className="grid md:grid-cols-12 gap-10">
-            <p className="md:col-span-3 eyebrow text-offwhite/60">III — Restraint</p>
-            <div className="md:col-span-8 md:col-start-5 space-y-8">
+            <p className="md:col-span-3 eyebrow text-offwhite/60 reveal-subtle">III — Restraint</p>
+            <div className="md:col-span-8 md:col-start-5 space-y-8 reveal">
               <p className="font-serif text-3xl md:text-5xl leading-[1.2]">
                 The discipline is in what we choose not to make.
               </p>
@@ -118,8 +118,8 @@ function PhilosophyPage() {
       </section>
 
       <section className="mx-auto max-w-[1480px] px-6 md:px-10 py-32 text-center">
-        <p className="eyebrow mb-6">Begin</p>
-        <h2 className="font-serif text-4xl md:text-6xl leading-tight max-w-3xl mx-auto">
+        <p className="eyebrow mb-6 reveal-subtle">Begin</p>
+        <h2 className="font-serif text-4xl md:text-6xl leading-tight max-w-3xl mx-auto reveal">
           A wardrobe assembled slowly.
         </h2>
         <div className="mt-12 flex flex-wrap justify-center gap-10">

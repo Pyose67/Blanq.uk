@@ -9,9 +9,18 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
   const [avg, setAvg] = useState<{ average: number; count: number } | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+    setAvg(null);
     getProductReviews(product.id)
-      .then(({ average, count }) => setAvg({ average, count }))
-      .catch(() => {});
+      .then(({ average, count }) => {
+        if (!cancelled) setAvg({ average, count });
+      })
+      .catch(() => {
+        if (!cancelled) setAvg({ average: 0, count: 0 });
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [product.id]);
 
   return (

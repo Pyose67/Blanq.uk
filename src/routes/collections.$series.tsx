@@ -129,8 +129,8 @@ function CollectionPage() {
     <>
       <section className="border-b border-border">
         <div className="mx-auto max-w-[1480px] px-6 md:px-10 py-20 md:py-28">
-          <p className="eyebrow mb-6">Catalogue / {headline.title}</p>
-          <h1 className="font-serif text-5xl md:text-7xl leading-[1.05] tracking-tight max-w-3xl">
+          <p className="eyebrow mb-6 reveal-subtle">Catalogue / {headline.title}</p>
+          <h1 className="font-serif text-5xl md:text-7xl leading-[1.05] tracking-tight max-w-3xl reveal">
             {headline.title}
           </h1>
           {headline.description && (
@@ -178,7 +178,7 @@ function CollectionPage() {
                 </Link>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16 stagger-grid">
                 {filtered.map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
