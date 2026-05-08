@@ -38,45 +38,67 @@ function _parsePathAndQuery(reqUrl) {
   return { pathname, params };
 }
 
+const _empty = () =>
+  new Response(JSON.stringify({ reviews: [] }), {
+    status: 200,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+  });
+
 async function _judgemeProxy(request, env) {
   try {
     const { params: queryParams } = _parsePathAndQuery(request.url);
-    const productId = queryParams.get("product_id");
+    const shopifyId = queryParams.get("product_id"); // Shopify numeric product ID
     const perPage = queryParams.get("per_page") || "100";
-    if (!productId) {
+    if (!shopifyId) {
       return new Response(JSON.stringify({ error: "product_id required" }), {
         status: 400,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
       });
     }
-    const params = new URLSearchParams({
-      api_token: env.JUDGEME_PRIVATE_TOKEN || "",
-      shop_domain: env.JUDGEME_SHOP_DOMAIN || "",
-      external_id: productId,
-      per_page: perPage,
-    });
-    const apiUrl = "https://judge.me/api/v1/reviews?" + params.toString();
 
-    const res = await _nativeFetch(apiUrl);
-    if (!res.ok) {
-      return new Response(JSON.stringify({ reviews: [] }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
+    const token = env.JUDGEME_PRIVATE_TOKEN || "";
+    const domain = env.JUDGEME_SHOP_DOMAIN || "";
+
+    // Step 1 — resolve Shopify product ID → Judge.me internal product ID.
+    // external_id does NOT reliably filter the /reviews endpoint; we must use
+    // Judge.me's own product_id (small integer) to get an exact match.
+    const productLookupUrl =
+      "https://judge.me/api/v1/products/show?" +
+      new URLSearchParams({ api_token: token, shop_domain: domain, external_id: shopifyId });
+
+    let judgemeProductId = null;
+    try {
+      const productRes = await _nativeFetch(productLookupUrl);
+      if (productRes.ok) {
+        const productData = await productRes.json();
+        // Response shape: { product: { id: 123, external_id: "...", ... } }
+        judgemeProductId = productData?.product?.id ?? null;
+      }
+    } catch { /* product lookup failed — treat as no reviews */ }
+
+    // If the product isn't in Judge.me at all, return empty immediately.
+    if (!judgemeProductId) return _empty();
+
+    // Step 2 — fetch reviews for the exact Judge.me product ID.
+    const reviewsUrl =
+      "https://judge.me/api/v1/reviews?" +
+      new URLSearchParams({
+        api_token: token,
+        shop_domain: domain,
+        product_id: String(judgemeProductId),
+        per_page: perPage,
       });
-    }
+
+    const res = await _nativeFetch(reviewsUrl);
+    if (!res.ok) return _empty();
+
     const data = await res.json();
     return new Response(JSON.stringify(data), {
       status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        "Cache-Control": "public, max-age=300, s-maxage=300",
-      },
+      headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
     });
   } catch {
-    return new Response(JSON.stringify({ reviews: [] }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return _empty();
   }
 }
 
