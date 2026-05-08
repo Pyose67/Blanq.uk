@@ -605,10 +605,12 @@ function ReviewsSection({ productId }: { productId: string }) {
                     <Stars rating={r.rating} />
                   </div>
                   <p className="text-foreground/85 leading-relaxed text-[15px]">{r.body}</p>
-                  <p className="mt-3 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                    {r.author}
-                    {r.verified && <span className="ml-2 text-foreground/60">— Verified</span>}
-                  </p>
+                  {(r.title || r.verified) && (
+                    <p className="mt-3 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                      {r.title && r.author}
+                      {r.verified && <span className="ml-2 text-foreground/60">— Verified</span>}
+                    </p>
+                  )}
                 </li>
               ))}
             </ul>

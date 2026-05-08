@@ -382,7 +382,7 @@ export async function getProductReviews(productId: string): Promise<ProductRevie
     const url = `/api/reviews?product_id=${encodeURIComponent(numericId)}&per_page=100`;
     const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) return { average: 0, count: 0, reviews: [] };
-    const json: { reviews?: JudgemeReview[] } = await res.json();
+    const json: { reviews?: JudgemeReview[]; rating?: number; reviews_count?: number } = await res.json();
 
     const reviews: ProductReview[] = (json.reviews ?? []).map((r) => ({
       id: String(r.id),
@@ -393,8 +393,8 @@ export async function getProductReviews(productId: string): Promise<ProductRevie
       createdAt: r.created_at,
       verified: r.verified === "buyer",
     }));
-    const count = reviews.length;
-    const average = count ? reviews.reduce((s, r) => s + r.rating, 0) / count : 0;
+    const count = json.reviews_count ?? reviews.length;
+    const average = json.rating ?? (reviews.length ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0);
     return { average, count, reviews };
   } catch {
     return { average: 0, count: 0, reviews: [] };
