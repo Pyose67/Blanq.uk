@@ -601,7 +601,7 @@ function ReviewsSection({ productId }: { productId: string }) {
               {visible.map((r) => (
                 <li key={r.id} className="py-6">
                   <div className="flex flex-wrap items-baseline justify-between gap-3 mb-2">
-                    <p className="font-serif text-lg text-ink">{r.title || "Untitled"}</p>
+                    <p className="font-serif text-lg text-ink">{r.title || r.author}</p>
                     <Stars rating={r.rating} />
                   </div>
                   <p className="text-foreground/85 leading-relaxed text-[15px]">{r.body}</p>

@@ -387,7 +387,7 @@ export async function getProductReviews(productId: string): Promise<ProductRevie
     const reviews: ProductReview[] = (json.reviews ?? []).map((r) => ({
       id: String(r.id),
       author: r.reviewer?.name?.trim() || "Anonymous",
-      rating: Math.max(1, Math.min(5, Math.round(r.rating))),
+      rating: Math.max(1, Math.min(5, r.rating)),
       title: (r.title ?? "").trim(),
       body: (r.body ?? "").trim(),
       createdAt: r.created_at,
