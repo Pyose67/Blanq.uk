@@ -69,7 +69,7 @@ async function _judgemeProxy(request, env) {
       status: 200,
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": "public, max-age=300, s-maxage=300",
+        "Cache-Control": "no-store",
       },
     });
   } catch {

@@ -380,7 +380,7 @@ export async function getProductReviews(productId: string): Promise<ProductRevie
     // Chama o proxy interno (Cloudflare Pages Function) que usa o token privado.
     // Em dev, o Vite não tem este endpoint — retorna vazio silenciosamente.
     const url = `/api/reviews?product_id=${encodeURIComponent(numericId)}&per_page=100`;
-    const res = await fetch(url);
+    const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) return { average: 0, count: 0, reviews: [] };
     const json: { reviews?: JudgemeReview[] } = await res.json();
 
