@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python -m json.tool --no-ensure-ascii)"
+      "Bash(python -m json.tool --no-ensure-ascii)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }

@@ -10,6 +10,18 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from "@/components/ui/carousel";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
   getProductByHandle,
   getProductReviews,
   addProductReview,
@@ -82,6 +94,20 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
   const [size, setSize] = useState<string | null>(null);
   const [activeImage, setActiveImage] = useState(0);
   const [added, setAdded] = useState(false);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [carouselIndex, setCarouselIndex] = useState(0);
+  const [reviewsSummary, setReviewsSummary] = useState<ProductReviewsSummary | undefined>();
+
+  useEffect(() => {
+    getProductReviews(product.id).then(setReviewsSummary).catch(() => {});
+  }, [product.id]);
+
+  useEffect(() => {
+    if (!carouselApi) return;
+    const onSelect = () => setCarouselIndex(carouselApi.selectedScrollSnap());
+    carouselApi.on("select", onSelect);
+    return () => { carouselApi.off("select", onSelect); };
+  }, [carouselApi]);
 
   const variant = useMemo(
     () => (size ? findVariant(product, { [colourKey]: colour, [sizeKey]: size }) : undefined),
@@ -120,28 +146,65 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
       <section className="mx-auto max-w-[1480px] px-5 md:px-10 py-8 md:py-12">
         <div className="grid md:grid-cols-2 gap-8 md:gap-16">
           {/* Gallery */}
-          <div className="space-y-4 fade-in-up [animation-delay:100ms]">
-            <div className="aspect-[4/5] bg-muted overflow-hidden">
-              <img
-                src={product.images[activeImage].url}
-                alt={product.images[activeImage].altText ?? product.title}
-                width={product.images[activeImage].width}
-                height={product.images[activeImage].height}
-                className="h-full w-full object-cover"
-              />
+          <div className="fade-in-up [animation-delay:100ms]">
+            {/* Mobile — swipeable carousel */}
+            <div className="md:hidden">
+              <Carousel setApi={setCarouselApi} opts={{ loop: false }} className="w-full">
+                <CarouselContent className="-ml-0">
+                  {product.images.map((img) => (
+                    <CarouselItem key={img.url} className="pl-0">
+                      <div className="aspect-[4/5] bg-muted overflow-hidden">
+                        <img
+                          src={img.url}
+                          alt={img.altText ?? product.title}
+                          width={img.width}
+                          height={img.height}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              </Carousel>
+              <div className="flex gap-2 mt-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {product.images.map((img, i) => (
+                  <button
+                    key={img.url}
+                    type="button"
+                    onClick={() => carouselApi?.scrollTo(i)}
+                    className={`flex-none w-[17vw] aspect-square bg-muted overflow-hidden border transition-colors ${i === carouselIndex ? "border-ink" : "border-transparent"}`}
+                    aria-label={`View image ${i + 1}`}
+                  >
+                    <img src={img.url} alt="" loading="lazy" className="h-full w-full object-cover" />
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="grid grid-cols-3 gap-3">
-              {product.images.map((img, i) => (
-                <button
-                  key={img.url}
-                  type="button"
-                  onClick={() => setActiveImage(i)}
-                  className={`aspect-square bg-muted overflow-hidden border ${i === activeImage ? "border-ink" : "border-transparent"}`}
-                  aria-label={`View image ${i + 1}`}
-                >
-                  <img src={img.url} alt="" loading="lazy" className="h-full w-full object-cover" />
-                </button>
-              ))}
+
+            {/* Desktop — static stack */}
+            <div className="hidden md:block space-y-4">
+              <div className="aspect-[4/5] bg-muted overflow-hidden">
+                <img
+                  src={product.images[activeImage].url}
+                  alt={product.images[activeImage].altText ?? product.title}
+                  width={product.images[activeImage].width}
+                  height={product.images[activeImage].height}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                {product.images.map((img, i) => (
+                  <button
+                    key={img.url}
+                    type="button"
+                    onClick={() => setActiveImage(i)}
+                    className={`aspect-square bg-muted overflow-hidden border ${i === activeImage ? "border-ink" : "border-transparent"}`}
+                    aria-label={`View image ${i + 1}`}
+                  >
+                    <img src={img.url} alt="" loading="lazy" className="h-full w-full object-cover" />
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -151,7 +214,17 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
             <h1 className="font-serif text-4xl md:text-5xl leading-[1.05] tracking-tight text-ink">
               {product.title}
             </h1>
-            <p className="mt-4 text-lg tabular-nums text-foreground">{formatMoney(displayPrice)}</p>
+            <div className="mt-4 flex flex-wrap items-center gap-4">
+              <p className="text-lg tabular-nums text-foreground">{formatMoney(displayPrice)}</p>
+              {reviewsSummary && reviewsSummary.count > 0 && (
+                <div className="flex items-center gap-1.5">
+                  <Stars rating={reviewsSummary.average} />
+                  <span className="text-xs text-muted-foreground tabular-nums">
+                    {reviewsSummary.average.toFixed(1)} · {reviewsSummary.count} {reviewsSummary.count === 1 ? "review" : "reviews"}
+                  </span>
+                </div>
+              )}
+            </div>
 
             <div className="hairline my-8" />
 
@@ -265,33 +338,44 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
               United Kingdom. Considered returns within thirty days.
             </p>
 
-            {/* Material Properties — always visible */}
-            {(product.metafields.materialProps?.length ?? 0) > 0 && (
-              <div className="mt-12 pt-8 border-t border-border">
-                <p className="eyebrow mb-5">Material Properties</p>
-                <ul className="space-y-5">
-                  {product.metafields.materialProps!.map((p) => (
-                    <li key={p.title}>
-                      <p className="font-serif text-base text-ink">{p.title}</p>
-                      <p className="text-sm text-muted-foreground leading-relaxed mt-1">{p.body}</p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Technical Notes — always visible */}
-            {(product.metafields.techNotes?.length ?? 0) > 0 && (
-              <div className="mt-10 pt-8 border-t border-border">
-                <p className="eyebrow mb-5">Technical Notes</p>
-                <dl className="divide-y divide-border border-t border-border">
-                  {product.metafields.techNotes!.map((s) => (
-                    <div key={s.label} className="grid grid-cols-3 py-3 gap-4">
-                      <dt className="eyebrow !text-foreground/60">{s.label}</dt>
-                      <dd className="col-span-2 text-foreground/90 text-sm">{s.value}</dd>
-                    </div>
-                  ))}
-                </dl>
+            {/* Product Details — collapsible */}
+            {((product.metafields.materialProps?.length ?? 0) > 0 || (product.metafields.techNotes?.length ?? 0) > 0) && (
+              <div className="mt-8 border-t border-border">
+                <Accordion type="single" collapsible>
+                  <AccordionItem value="details" className="border-none">
+                    <AccordionTrigger className="eyebrow !text-foreground py-5 hover:no-underline">
+                      Product Details
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-0">
+                      {(product.metafields.materialProps?.length ?? 0) > 0 && (
+                        <div className="pb-6">
+                          <p className="eyebrow mb-4 !text-foreground/60">Material Properties</p>
+                          <ul className="space-y-5">
+                            {product.metafields.materialProps!.map((p) => (
+                              <li key={p.title}>
+                                <p className="font-serif text-base text-ink">{p.title}</p>
+                                <p className="text-sm text-muted-foreground leading-relaxed mt-1">{p.body}</p>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {(product.metafields.techNotes?.length ?? 0) > 0 && (
+                        <div className={`pb-6 ${(product.metafields.materialProps?.length ?? 0) > 0 ? "pt-6 border-t border-border" : ""}`}>
+                          <p className="eyebrow mb-4 !text-foreground/60">Technical Notes</p>
+                          <dl className="divide-y divide-border border-t border-border">
+                            {product.metafields.techNotes!.map((s) => (
+                              <div key={s.label} className="grid grid-cols-3 py-3 gap-4">
+                                <dt className="eyebrow !text-foreground/60">{s.label}</dt>
+                                <dd className="col-span-2 text-foreground/90 text-sm">{s.value}</dd>
+                              </div>
+                            ))}
+                          </dl>
+                        </div>
+                      )}
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </div>
             )}
           </div>
