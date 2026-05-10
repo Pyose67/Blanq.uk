@@ -77,19 +77,22 @@ async function _judgemeProxy(request, env) {
         const lr = await _nativeFetch(lookupUrl);
         if (lr.ok) { const ld = await lr.json(); postProductId = ld?.product?.id ?? null; }
       } catch { /* proceed without product id */ }
-      const fd = new FormData();
-      fd.append("api_token", token);
-      fd.append("shop_domain", domain);
-      fd.append("platform", "shopify");
-      if (postProductId) fd.append("id", String(postProductId));
-      fd.append("reviewer[name]", payload.name || "Anonymous");
-      fd.append("reviewer[email]", payload.email);
-      fd.append("review[rating]", String(payload.rating));
-      fd.append("review[title]", payload.title || "");
-      fd.append("review[body]", payload.body || "");
       const postRes = await _nativeFetch("https://judge.me/api/v1/reviews", {
         method: "POST",
-        body: fd,
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+          api_token: token,
+          shop_domain: domain,
+          platform: "shopify",
+          id: postProductId,
+          email: payload.email,
+          name: payload.name || "Anonymous",
+          rating: payload.rating,
+          title: payload.title || "",
+          body: payload.body || "",
+          reviewer: { email: payload.email, name: payload.name || "Anonymous" },
+          review: { rating: payload.rating, title: payload.title || "", body: payload.body || "" },
+        }),
       });
       const responseText = await postRes.text();
       let errorMsg = "Something went wrong. Please try again.";
