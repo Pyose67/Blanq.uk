@@ -96,6 +96,23 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
     getProductReviews(product.id).then(setReviewsSummary).catch(() => {});
   }, [product.id]);
 
+  useEffect(() => {
+    setActiveImage(0);
+    setCarouselIndex(0);
+    mobileScrollRef.current?.scrollTo({ left: 0, behavior: "instant" });
+  }, [colour]);
+
+  const filteredImages = useMemo(() => {
+    if (!colour) return product.images;
+    const filtered = product.images.filter((img) => {
+      const alt = (img.altText ?? "").trim();
+      if (!alt) return true;
+      const parts = alt.includes(",") ? alt.split(",").map((p) => p.trim()) : [alt];
+      return parts.some((part) => part.toLowerCase().includes(colour.toLowerCase()));
+    });
+    return filtered.length > 0 ? filtered : product.images;
+  }, [product.images, colour]);
+
   function scrollToMobileImage(index: number) {
     const el = mobileScrollRef.current;
     if (!el) return;
@@ -155,7 +172,7 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
                   onScroll={handleMobileScroll}
                   className="flex h-full w-full overflow-x-scroll snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                 >
-                  {product.images.map((img) => (
+                  {filteredImages.map((img) => (
                     <div key={img.url} className="flex-none w-full h-full snap-start shrink-0 bg-muted">
                       <img
                         src={img.url}
@@ -169,7 +186,7 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
                 </div>
               </div>
               <div className="flex gap-2 mt-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {product.images.map((img, i) => (
+                {filteredImages.map((img, i) => (
                   <button
                     key={img.url}
                     type="button"
@@ -187,15 +204,15 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
             <div className="hidden md:block space-y-4">
               <div className="aspect-[4/5] bg-muted overflow-hidden">
                 <img
-                  src={product.images[activeImage].url}
-                  alt={product.images[activeImage].altText ?? product.title}
-                  width={product.images[activeImage].width}
-                  height={product.images[activeImage].height}
+                  src={filteredImages[activeImage].url}
+                  alt={filteredImages[activeImage].altText ?? product.title}
+                  width={filteredImages[activeImage].width}
+                  height={filteredImages[activeImage].height}
                   className="h-full w-full object-cover"
                 />
               </div>
               <div className="grid grid-cols-3 gap-3">
-                {product.images.map((img, i) => (
+                {filteredImages.map((img, i) => (
                   <button
                     key={img.url}
                     type="button"
