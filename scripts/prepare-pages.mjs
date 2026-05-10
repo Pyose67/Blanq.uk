@@ -59,8 +59,8 @@ async function _judgemeProxy(request, env) {
     const token = env.JUDGEME_PRIVATE_TOKEN || "";
     const domain = env.JUDGEME_SHOP_DOMAIN || "";
 
-    // POST — submit review using external_id directly (no product lookup needed).
-    // Flat JSON format matches what Judge.me accepts for /api/v1/reviews.
+    // POST — submit review. Resolve internal Judge.me product ID first so the
+    // review is attached to the product (flat JSON + id = product review).
     if (request.method === "POST") {
       let payload = {};
       try { payload = await request.json(); } catch { /* ignore */ }
@@ -70,6 +70,13 @@ async function _judgemeProxy(request, env) {
           headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
         });
       }
+      let postProductId = null;
+      try {
+        const lookupUrl = "https://judge.me/api/v1/products/show?" +
+          new URLSearchParams({ api_token: token, shop_domain: domain, external_id: shopifyId });
+        const lr = await _nativeFetch(lookupUrl);
+        if (lr.ok) { const ld = await lr.json(); postProductId = ld?.product?.id ?? null; }
+      } catch { /* proceed without product id */ }
       const postRes = await _nativeFetch("https://judge.me/api/v1/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
@@ -77,7 +84,7 @@ async function _judgemeProxy(request, env) {
           api_token: token,
           shop_domain: domain,
           platform: "shopify",
-          external_id: shopifyId,
+          id: postProductId,
           name: payload.name || "Anonymous",
           email: payload.email,
           rating: payload.rating,
