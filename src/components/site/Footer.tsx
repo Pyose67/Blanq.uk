@@ -141,7 +141,7 @@ export function Footer() {
                   <Facebook className="h-4 w-4" strokeWidth={1.4} /> Facebook
                 </a>
               </li>
-              <li className="pt-2 relative">
+              <li className="pt-2">
                 <a
                   href={`mailto:${siteConfig.contact.email}`}
                   onClick={handleEmailClick}
@@ -149,11 +149,16 @@ export function Footer() {
                 >
                   {siteConfig.contact.email}
                 </a>
-                {emailCopied && (
-                  <span className="absolute -top-6 left-0 text-[10px] uppercase tracking-[0.18em] text-foreground/60">
-                    Copied
-                  </span>
-                )}
+                <span
+                  className={`mt-2 flex items-center gap-1.5 text-[11px] uppercase tracking-[0.18em] font-medium text-ink transition-all duration-300 ${
+                    emailCopied ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-1 pointer-events-none"
+                  }`}
+                >
+                  <svg viewBox="0 0 12 12" className="h-3 w-3 fill-none stroke-current" strokeWidth={2}>
+                    <polyline points="1.5,6.5 4.5,9.5 10.5,3" />
+                  </svg>
+                  Copied to clipboard
+                </span>
               </li>
             </ul>
           </div>
