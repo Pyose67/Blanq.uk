@@ -412,13 +412,27 @@ export async function getProductReviews(productId: string): Promise<ProductRevie
   }
 }
 
-// Submit-review (POST) is intentionally not implemented yet — GET only for now.
 export async function addProductReview(
-  _productId: string,
-  _input: { author: string; rating: number; title: string; body: string },
-): Promise<ProductReviewsSummary> {
-  // Placeholder so existing UI compiles; wire to Judge.me POST when ready.
-  return getProductReviews(_productId);
+  productId: string,
+  input: { author: string; email: string; rating: number; title: string; body: string },
+): Promise<boolean> {
+  try {
+    const numericId = gidToNumericId(productId);
+    const res = await fetch(`/api/reviews?product_id=${encodeURIComponent(numericId)}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: input.author,
+        email: input.email,
+        rating: input.rating,
+        title: input.title,
+        body: input.body,
+      }),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
 }
 
 // =====================================================================

@@ -543,7 +543,10 @@ function ReviewsSection({ productId }: { productId: string }) {
   const [data, setData] = useState<ProductReviewsSummary | undefined>(undefined);
   const [open, setOpen] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [author, setAuthor] = useState("");
+  const [email, setEmail] = useState("");
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [title, setTitle] = useState("");
@@ -566,15 +569,20 @@ function ReviewsSection({ productId }: { productId: string }) {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!rating || !body.trim()) return;
-    const updated = await addProductReview(productId, { author, rating, title, body });
-    setData(updated);
-    setAuthor("");
-    setRating(0);
-    setHover(0);
-    setTitle("");
-    setBody("");
-    setShowForm(false);
+    if (!rating || !body.trim() || !email.trim()) return;
+    setSubmitting(true);
+    const ok = await addProductReview(productId, { author, email, rating, title, body });
+    setSubmitting(false);
+    if (ok) {
+      setSubmitted(true);
+      setAuthor("");
+      setEmail("");
+      setRating(0);
+      setHover(0);
+      setTitle("");
+      setBody("");
+      setShowForm(false);
+    }
   }
 
   if (data === undefined) {
@@ -634,13 +642,19 @@ function ReviewsSection({ productId }: { productId: string }) {
               </p>
             </>
           )}
-          <button
-            type="button"
-            onClick={() => setShowForm((s) => !s)}
-            className="mt-6 inline-block text-[11px] uppercase tracking-[0.22em] link-underline"
-          >
-            {showForm ? "Close" : "Write a review"}
-          </button>
+          {submitted ? (
+            <p className="mt-6 text-sm text-muted-foreground leading-relaxed">
+              Thank you. Your review has been submitted and is awaiting approval.
+            </p>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setShowForm((s) => !s)}
+              className="mt-6 inline-block text-[11px] uppercase tracking-[0.22em] link-underline"
+            >
+              {showForm ? "Close" : "Write a review"}
+            </button>
+          )}
         </div>
 
         <div className="md:col-span-7 md:col-start-6 space-y-8">
@@ -677,12 +691,20 @@ function ReviewsSection({ productId }: { productId: string }) {
                   className="bg-transparent border-b border-border focus:border-foreground outline-none py-2 text-sm"
                 />
                 <input
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="A short title"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Your email (not published)"
                   className="bg-transparent border-b border-border focus:border-foreground outline-none py-2 text-sm"
                 />
               </div>
+              <input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="A short title (optional)"
+                className="w-full bg-transparent border-b border-border focus:border-foreground outline-none py-2 text-sm"
+              />
               <textarea
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
@@ -693,10 +715,10 @@ function ReviewsSection({ productId }: { productId: string }) {
               />
               <button
                 type="submit"
-                disabled={!rating || !body.trim()}
+                disabled={!rating || !body.trim() || !email.trim() || submitting}
                 className="px-6 py-3 bg-ink text-offwhite text-[11px] uppercase tracking-[0.28em] disabled:bg-disabled disabled:cursor-not-allowed"
               >
-                Submit review
+                {submitting ? "Submitting…" : "Submit review"}
               </button>
             </form>
           )}

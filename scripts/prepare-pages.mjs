@@ -79,7 +79,39 @@ async function _judgemeProxy(request, env) {
     // If the product isn't in Judge.me at all, return empty immediately.
     if (!judgemeProductId) return _empty();
 
-    // Step 2 — fetch reviews for the exact Judge.me product ID.
+    // POST — submit a new review to Judge.me (pending approval).
+    if (request.method === "POST") {
+      let body = {};
+      try { body = await request.json(); } catch { /* ignore */ }
+      const postRes = await _nativeFetch("https://judge.me/api/v1/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          api_token: token,
+          shop_domain: domain,
+          platform: "shopify",
+          id: judgemeProductId,
+          reviewer: {
+            name: body.name || "Anonymous",
+            email: body.email || "",
+            accepts_marketing: false,
+          },
+          review: {
+            title: body.title || "",
+            body: body.body || "",
+            rating: body.rating,
+            source: "web",
+          },
+        }),
+      });
+      const text = await postRes.text();
+      return new Response(text, {
+        status: postRes.status,
+        headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+      });
+    }
+
+    // GET — fetch reviews for the exact Judge.me product ID.
     const reviewsUrl =
       "https://judge.me/api/v1/reviews?" +
       new URLSearchParams({
