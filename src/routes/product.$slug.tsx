@@ -556,8 +556,6 @@ function ReviewsSection({ productId }: { productId: string }) {
   const [hover, setHover] = useState(0);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [photos, setPhotos] = useState<File[]>([]);
-
   useEffect(() => {
     let cancelled = false;
     setData(undefined);
@@ -573,34 +571,16 @@ function ReviewsSection({ productId }: { productId: string }) {
     };
   }, [productId]);
 
-  function handlePhotoAdd(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files || []).filter((f) => f.type.startsWith("image/"));
-    setPhotos((prev) => [...prev, ...files].slice(0, 3));
-    e.target.value = "";
-  }
-
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!rating || !body.trim() || !email.trim()) return;
     setSubmitting(true);
     setSubmitError(null);
-    const photoUrls: string[] = [];
-    for (const photo of photos) {
-      try {
-        const dataUrl = await new Promise<string>((res, rej) => {
-          const reader = new FileReader();
-          reader.onload = () => res(reader.result as string);
-          reader.onerror = rej;
-          reader.readAsDataURL(photo);
-        });
-        photoUrls.push(dataUrl);
-      } catch { /* skip */ }
-    }
-    const result = await addProductReview(productId, { author, email, rating, title, body, photos: photoUrls });
+    const result = await addProductReview(productId, { author, email, rating, title, body });
     setSubmitting(false);
     if (result.ok) {
       setSubmitted(true);
-      setAuthor(""); setEmail(""); setRating(0); setHover(0); setTitle(""); setBody(""); setPhotos([]);
+      setAuthor(""); setEmail(""); setRating(0); setHover(0); setTitle(""); setBody("");
       setShowForm(false);
     } else {
       setSubmitError(result.error ?? "Something went wrong. Please try again.");
@@ -735,33 +715,6 @@ function ReviewsSection({ productId }: { productId: string }) {
                 required
                 className="w-full bg-transparent border border-border focus:border-foreground outline-none p-3 text-sm leading-relaxed resize-none"
               />
-              <div>
-                <label className="eyebrow !text-foreground/60 mb-3 block">Photos (optional)</label>
-                <div className="flex items-center gap-2 flex-wrap">
-                  {photos.map((photo, i) => (
-                    <div key={i} className="relative w-14 h-14 bg-muted overflow-hidden flex-none">
-                      <img src={URL.createObjectURL(photo)} alt="" className="w-full h-full object-cover" />
-                      <button
-                        type="button"
-                        onClick={() => setPhotos((p) => p.filter((_, idx) => idx !== i))}
-                        aria-label="Remove photo"
-                        className="absolute top-0 right-0 w-4 h-4 bg-ink text-offwhite text-[10px] flex items-center justify-center"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                  {photos.length < 3 && (
-                    <label className="w-14 h-14 border border-dashed border-border hover:border-foreground flex items-center justify-center cursor-pointer transition-colors flex-none">
-                      <input type="file" accept="image/*" multiple className="sr-only" onChange={handlePhotoAdd} />
-                      <svg viewBox="0 0 16 16" className="h-4 w-4 text-muted-foreground" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                        <path d="M8 3v10M3 8h10" />
-                      </svg>
-                    </label>
-                  )}
-                </div>
-                <p className="mt-2 text-xs text-muted-foreground">Up to 3 photos</p>
-              </div>
               <div className="flex flex-col gap-3">
                 <button
                   type="submit"
