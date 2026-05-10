@@ -703,20 +703,21 @@ function ReviewsSection({ productId }: { productId: string }) {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Your email — kept private, never shared"
+                  placeholder="Email address"
                   className="bg-transparent border-b border-border focus:border-foreground outline-none py-2 text-sm"
                 />
               </div>
+              <p className="text-xs text-muted-foreground -mt-1">Your email is kept private and never shared.</p>
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="A short title (optional)"
+                placeholder="A headline for your review (optional)"
                 className="w-full bg-transparent border-b border-border focus:border-foreground outline-none py-2 text-sm"
               />
               <textarea
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
-                placeholder="Share your impressions of the fit, fabric and finish."
+                placeholder="Your impressions of the fit, fabric and finish."
                 rows={4}
                 required
                 className="w-full bg-transparent border border-border focus:border-foreground outline-none p-3 text-sm leading-relaxed resize-none"
