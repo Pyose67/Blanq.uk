@@ -100,13 +100,6 @@ async function _judgemeProxy(request, env) {
           shop_domain: domain,
           platform: "shopify",
           id: judgemeProductId,
-          // flat fields (some API versions)
-          name: payload.name || "Anonymous",
-          email: payload.email,
-          rating: payload.rating,
-          title: payload.title || "",
-          body: payload.body || "",
-          // nested fields (other API versions)
           reviewer: {
             name: payload.name || "Anonymous",
             email: payload.email,

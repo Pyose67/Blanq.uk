@@ -703,7 +703,7 @@ function ReviewsSection({ productId }: { productId: string }) {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Your email (not published)"
+                  placeholder="Your email — kept private, never shared"
                   className="bg-transparent border-b border-border focus:border-foreground outline-none py-2 text-sm"
                 />
               </div>
