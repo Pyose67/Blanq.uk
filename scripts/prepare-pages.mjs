@@ -92,25 +92,21 @@ async function _judgemeProxy(request, env) {
           headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
         });
       }
+      const formBody = new URLSearchParams({
+        api_token: token,
+        shop_domain: domain,
+        platform: "shopify",
+        id: String(judgemeProductId),
+        "reviewer[name]": payload.name || "Anonymous",
+        "reviewer[email]": payload.email,
+        "review[rating]": String(payload.rating),
+        "review[title]": payload.title || "",
+        "review[body]": payload.body || "",
+      });
       const postRes = await _nativeFetch("https://judge.me/api/v1/reviews", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          api_token: token,
-          shop_domain: domain,
-          platform: "shopify",
-          id: judgemeProductId,
-          reviewer: {
-            name: payload.name || "Anonymous",
-            email: payload.email,
-            accepts_marketing: false,
-          },
-          review: {
-            title: payload.title || "",
-            body: payload.body || "",
-            rating: payload.rating,
-          },
-        }),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formBody.toString(),
       });
       const responseText = await postRes.text();
       return new Response(
