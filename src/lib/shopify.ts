@@ -93,6 +93,7 @@ export interface ProductReviewsSummary {
   average: number;
   count: number;
   reviews: ProductReview[];
+  distribution: Record<1 | 2 | 3 | 4 | 5, number>;
 }
 
 // =====================================================================
@@ -400,9 +401,14 @@ export async function getProductReviews(productId: string): Promise<ProductRevie
     }));
     const count = json.reviews_count ?? reviews.length;
     const average = json.rating ?? (reviews.length ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0);
-    return { average, count, reviews };
+    const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } as Record<1 | 2 | 3 | 4 | 5, number>;
+    for (const r of reviews) {
+      const star = Math.round(r.rating) as 1 | 2 | 3 | 4 | 5;
+      if (star >= 1 && star <= 5) distribution[star]++;
+    }
+    return { average, count, reviews, distribution };
   } catch {
-    return { average: 0, count: 0, reviews: [] };
+    return { average: 0, count: 0, reviews: [], distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } };
   }
 }
 

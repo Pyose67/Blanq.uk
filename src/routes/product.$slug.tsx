@@ -557,7 +557,7 @@ function ReviewsSection({ productId }: { productId: string }) {
         if (!cancelled) setData(d);
       })
       .catch(() => {
-        if (!cancelled) setData({ average: 0, count: 0, reviews: [] });
+        if (!cancelled) setData({ average: 0, count: 0, reviews: [], distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } });
       });
     return () => {
       cancelled = true;
@@ -591,7 +591,7 @@ function ReviewsSection({ productId }: { productId: string }) {
   return (
     <section className="mx-auto max-w-[1480px] px-5 md:px-10 py-20 md:py-32">
       <div className="grid md:grid-cols-12 gap-10">
-        <div className="md:col-span-4">
+        <div className="md:col-span-4 md:sticky md:top-28 md:self-start">
           <p className="eyebrow mb-4">Client Notes</p>
           {hasReviews ? (
             <>
@@ -603,6 +603,25 @@ function ReviewsSection({ productId }: { productId: string }) {
                 <span className="text-xs text-muted-foreground">
                   {data.count} {data.count === 1 ? "review" : "reviews"}
                 </span>
+              </div>
+              <div className="mt-6 space-y-2">
+                {([5, 4, 3, 2, 1] as const).map((star) => {
+                  const n = data.distribution[star];
+                  const pct = data.reviews.length > 0 ? (n / data.reviews.length) * 100 : 0;
+                  return (
+                    <div key={star} className="flex items-center gap-3">
+                      <span className="text-xs tabular-nums text-muted-foreground w-3 text-right">{star}</span>
+                      <Star className="h-2.5 w-2.5 fill-ink text-ink flex-none" strokeWidth={0} />
+                      <div className="flex-1 h-1 bg-border rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-ink rounded-full transition-all duration-500"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <span className="text-xs tabular-nums text-muted-foreground w-5 text-right">{n}</span>
+                    </div>
+                  );
+                })}
               </div>
             </>
           ) : (
