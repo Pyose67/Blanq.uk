@@ -76,13 +76,16 @@ async function _judgemeProxy(request, env) {
       }
     } catch { /* product lookup failed — treat as no reviews */ }
 
-    // If the product isn't in Judge.me at all, return empty immediately.
-    if (!judgemeProductId) return _empty();
-
     // POST — submit a new review to Judge.me (pending approval).
     if (request.method === "POST") {
-      let body = {};
-      try { body = await request.json(); } catch { /* ignore */ }
+      if (!judgemeProductId) {
+        return new Response(JSON.stringify({ error: "Product not found in Judge.me" }), {
+          status: 404,
+          headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+        });
+      }
+      let payload = {};
+      try { payload = await request.json(); } catch { /* ignore */ }
       const postRes = await _nativeFetch("https://judge.me/api/v1/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -92,24 +95,29 @@ async function _judgemeProxy(request, env) {
           platform: "shopify",
           id: judgemeProductId,
           reviewer: {
-            name: body.name || "Anonymous",
-            email: body.email || "",
+            name: payload.name || "Anonymous",
+            email: payload.email || "",
             accepts_marketing: false,
           },
           review: {
-            title: body.title || "",
-            body: body.body || "",
-            rating: body.rating,
-            source: "web",
+            title: payload.title || "",
+            body: payload.body || "",
+            rating: payload.rating,
           },
         }),
       });
-      const text = await postRes.text();
-      return new Response(text, {
-        status: postRes.status,
-        headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
-      });
+      const responseText = await postRes.text();
+      return new Response(
+        postRes.ok ? JSON.stringify({ ok: true }) : JSON.stringify({ error: responseText }),
+        {
+          status: postRes.ok ? 200 : postRes.status,
+          headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+        }
+      );
     }
+
+    // If the product isn't in Judge.me at all, return empty for GET.
+    if (!judgemeProductId) return _empty();
 
     // GET — fetch reviews for the exact Judge.me product ID.
     const reviewsUrl =

@@ -415,7 +415,7 @@ export async function getProductReviews(productId: string): Promise<ProductRevie
 export async function addProductReview(
   productId: string,
   input: { author: string; email: string; rating: number; title: string; body: string },
-): Promise<boolean> {
+): Promise<{ ok: boolean; error?: string }> {
   try {
     const numericId = gidToNumericId(productId);
     const res = await fetch(`/api/reviews?product_id=${encodeURIComponent(numericId)}`, {
@@ -429,9 +429,15 @@ export async function addProductReview(
         body: input.body,
       }),
     });
-    return res.ok;
+    if (res.ok) return { ok: true };
+    let errorMsg = `Error ${res.status}`;
+    try {
+      const json = await res.json();
+      if (json.error) errorMsg = typeof json.error === "string" ? json.error : JSON.stringify(json.error);
+    } catch { /* ignore */ }
+    return { ok: false, error: errorMsg };
   } catch {
-    return false;
+    return { ok: false, error: "Network error. Please check your connection and try again." };
   }
 }
 

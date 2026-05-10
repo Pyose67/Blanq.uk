@@ -219,12 +219,16 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
             <div className="mt-4 flex flex-wrap items-center gap-4">
               <p className="text-lg tabular-nums text-foreground">{formatMoney(displayPrice)}</p>
               {reviewsSummary && reviewsSummary.count > 0 && (
-                <div className="flex items-center gap-1.5">
+                <a
+                  href="#reviews"
+                  className="flex items-center gap-1.5 group"
+                  aria-label="Go to reviews"
+                >
                   <Stars rating={reviewsSummary.average} />
-                  <span className="text-xs text-muted-foreground tabular-nums">
+                  <span className="text-xs text-muted-foreground tabular-nums group-hover:text-foreground transition-colors">
                     {reviewsSummary.average.toFixed(1)} · {reviewsSummary.count} {reviewsSummary.count === 1 ? "review" : "reviews"}
                   </span>
-                </div>
+                </a>
               )}
             </div>
 
@@ -545,6 +549,7 @@ function ReviewsSection({ productId }: { productId: string }) {
   const [showForm, setShowForm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [author, setAuthor] = useState("");
   const [email, setEmail] = useState("");
   const [rating, setRating] = useState(0);
@@ -571,9 +576,10 @@ function ReviewsSection({ productId }: { productId: string }) {
     e.preventDefault();
     if (!rating || !body.trim() || !email.trim()) return;
     setSubmitting(true);
-    const ok = await addProductReview(productId, { author, email, rating, title, body });
+    setSubmitError(null);
+    const result = await addProductReview(productId, { author, email, rating, title, body });
     setSubmitting(false);
-    if (ok) {
+    if (result.ok) {
       setSubmitted(true);
       setAuthor("");
       setEmail("");
@@ -582,6 +588,8 @@ function ReviewsSection({ productId }: { productId: string }) {
       setTitle("");
       setBody("");
       setShowForm(false);
+    } else {
+      setSubmitError(result.error ?? "Something went wrong. Please try again.");
     }
   }
 
@@ -597,7 +605,7 @@ function ReviewsSection({ productId }: { productId: string }) {
   const hasReviews = data.count > 0;
 
   return (
-    <section className="mx-auto max-w-[1480px] px-5 md:px-10 py-20 md:py-32">
+    <section id="reviews" className="mx-auto max-w-[1480px] px-5 md:px-10 py-20 md:py-32">
       <div className="grid md:grid-cols-12 gap-10">
         <div className="md:col-span-4 md:sticky md:top-28 md:self-start">
           <p className="eyebrow mb-4">Client Notes</p>
@@ -713,13 +721,18 @@ function ReviewsSection({ productId }: { productId: string }) {
                 required
                 className="w-full bg-transparent border border-border focus:border-foreground outline-none p-3 text-sm leading-relaxed resize-none"
               />
-              <button
-                type="submit"
-                disabled={!rating || !body.trim() || !email.trim() || submitting}
-                className="px-6 py-3 bg-ink text-offwhite text-[11px] uppercase tracking-[0.28em] disabled:bg-disabled disabled:cursor-not-allowed"
-              >
-                {submitting ? "Submitting…" : "Submit review"}
-              </button>
+              <div className="flex flex-col gap-3">
+                <button
+                  type="submit"
+                  disabled={!rating || !body.trim() || !email.trim() || submitting}
+                  className="px-6 py-3 bg-ink text-offwhite text-[11px] uppercase tracking-[0.28em] disabled:bg-disabled disabled:cursor-not-allowed self-start"
+                >
+                  {submitting ? "Submitting…" : "Submit review"}
+                </button>
+                {submitError && (
+                  <p className="text-sm text-red-600 leading-relaxed">{submitError}</p>
+                )}
+              </div>
             </form>
           )}
 
