@@ -92,26 +92,32 @@ async function _judgemeProxy(request, env) {
           headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
         });
       }
-      const enc = encodeURIComponent;
-      const formBody = [
-        "api_token=" + enc(token),
-        "shop_domain=" + enc(domain),
-        "platform=shopify",
-        "id=" + judgemeProductId,
-        "reviewer[name]=" + enc(payload.name || "Anonymous"),
-        "reviewer[email]=" + enc(payload.email),
-        "review[rating]=" + enc(String(payload.rating)),
-        "review[title]=" + enc(payload.title || ""),
-        "review[body]=" + enc(payload.body || ""),
-      ].join("&");
       const postRes = await _nativeFetch("https://judge.me/api/v1/reviews", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: formBody,
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+          api_token: token,
+          shop_domain: domain,
+          platform: "shopify",
+          id: judgemeProductId,
+          reviewer: { name: payload.name || "Anonymous", email: payload.email },
+          review: {
+            rating: payload.rating,
+            title: payload.title || "",
+            body: payload.body || "",
+          },
+        }),
       });
       const responseText = await postRes.text();
+      let errorMsg = "Something went wrong. Please try again.";
+      if (!postRes.ok) {
+        try {
+          const errJson = JSON.parse(responseText);
+          errorMsg = errJson.message || errJson.error || responseText;
+        } catch { errorMsg = responseText; }
+      }
       return new Response(
-        postRes.ok ? JSON.stringify({ ok: true }) : JSON.stringify({ error: responseText }),
+        postRes.ok ? JSON.stringify({ ok: true }) : JSON.stringify({ error: errorMsg }),
         {
           status: postRes.ok ? 200 : postRes.status,
           headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
