@@ -71,19 +71,19 @@ async function _judgemeProxy(request, env) {
         });
       }
       const hostedUrls = [];
-      const imgbbKey = env.IMGBB_API_KEY || "";
-      if (imgbbKey && Array.isArray(payload.picture_urls) && payload.picture_urls.length > 0) {
+      if (env.REVIEW_PHOTOS && Array.isArray(payload.picture_urls) && payload.picture_urls.length > 0) {
+        const r2Base = (env.R2_PUBLIC_URL || "").replace(/\/$/, "");
         for (const dataUrl of payload.picture_urls) {
           try {
-            const base64 = String(dataUrl).includes(",") ? String(dataUrl).split(",")[1] : String(dataUrl);
-            const imgForm = new FormData();
-            imgForm.append("key", imgbbKey);
-            imgForm.append("image", base64);
-            const imgRes = await _nativeFetch("https://api.imgbb.com/1/upload", { method: "POST", body: imgForm });
-            if (imgRes.ok) {
-              const imgData = await imgRes.json();
-              if (imgData && imgData.data && imgData.data.url) hostedUrls.push(imgData.data.url);
-            }
+            const s = String(dataUrl);
+            const mimeMatch = s.match(/^data:(image\/[a-z]+);base64,/);
+            const mime = mimeMatch ? mimeMatch[1] : "image/jpeg";
+            const ext = mime.split("/")[1] || "jpg";
+            const b64 = s.includes(",") ? s.split(",")[1] : s;
+            const binary = Uint8Array.from(atob(b64), function(c) { return c.charCodeAt(0); });
+            const key = "reviews/" + Date.now() + "-" + Math.random().toString(36).slice(2) + "." + ext;
+            await env.REVIEW_PHOTOS.put(key, binary, { httpMetadata: { contentType: mime } });
+            if (r2Base) hostedUrls.push(r2Base + "/" + key);
           } catch { /* skip failed photo */ }
         }
       }
