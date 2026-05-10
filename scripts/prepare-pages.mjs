@@ -59,31 +59,9 @@ async function _judgemeProxy(request, env) {
     const token = env.JUDGEME_PRIVATE_TOKEN || "";
     const domain = env.JUDGEME_SHOP_DOMAIN || "";
 
-    // Step 1 — resolve Shopify product ID → Judge.me internal product ID.
-    // external_id does NOT reliably filter the /reviews endpoint; we must use
-    // Judge.me's own product_id (small integer) to get an exact match.
-    const productLookupUrl =
-      "https://judge.me/api/v1/products/show?" +
-      new URLSearchParams({ api_token: token, shop_domain: domain, external_id: shopifyId });
-
-    let judgemeProductId = null;
-    try {
-      const productRes = await _nativeFetch(productLookupUrl);
-      if (productRes.ok) {
-        const productData = await productRes.json();
-        // Response shape: { product: { id: 123, external_id: "...", ... } }
-        judgemeProductId = productData?.product?.id ?? null;
-      }
-    } catch { /* product lookup failed — treat as no reviews */ }
-
-    // POST — submit a new review to Judge.me (pending approval).
+    // POST — submit review using external_id directly (no product lookup needed).
+    // Flat JSON format matches what Judge.me accepts for /api/v1/reviews.
     if (request.method === "POST") {
-      if (!judgemeProductId) {
-        return new Response(JSON.stringify({ error: "Product not found in Judge.me" }), {
-          status: 404,
-          headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
-        });
-      }
       let payload = {};
       try { payload = await request.json(); } catch { /* ignore */ }
       if (!payload.email) {
@@ -99,13 +77,12 @@ async function _judgemeProxy(request, env) {
           api_token: token,
           shop_domain: domain,
           platform: "shopify",
-          id: judgemeProductId,
-          reviewer: { name: payload.name || "Anonymous", email: payload.email },
-          review: {
-            rating: payload.rating,
-            title: payload.title || "",
-            body: payload.body || "",
-          },
+          external_id: shopifyId,
+          name: payload.name || "Anonymous",
+          email: payload.email,
+          rating: payload.rating,
+          title: payload.title || "",
+          body: payload.body || "",
         }),
       });
       const responseText = await postRes.text();
@@ -124,6 +101,22 @@ async function _judgemeProxy(request, env) {
         }
       );
     }
+
+    // GET — resolve Shopify product ID → Judge.me internal product ID.
+    // external_id does NOT reliably filter the /reviews endpoint; we must use
+    // Judge.me's own product_id (small integer) to get an exact match.
+    const productLookupUrl =
+      "https://judge.me/api/v1/products/show?" +
+      new URLSearchParams({ api_token: token, shop_domain: domain, external_id: shopifyId });
+
+    let judgemeProductId = null;
+    try {
+      const productRes = await _nativeFetch(productLookupUrl);
+      if (productRes.ok) {
+        const productData = await productRes.json();
+        judgemeProductId = productData?.product?.id ?? null;
+      }
+    } catch { /* product lookup failed — treat as no reviews */ }
 
     // If the product isn't in Judge.me at all, return empty for GET.
     if (!judgemeProductId) return _empty();
