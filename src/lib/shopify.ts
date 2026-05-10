@@ -86,6 +86,7 @@ export interface ProductReview {
   body: string;
   createdAt: string;
   verified: boolean;
+  photos: string[];
 }
 
 export interface ProductReviewsSummary {
@@ -371,7 +372,8 @@ interface JudgemeReview {
   rating: number;
   reviewer: { name?: string | null; email?: string | null } | null;
   created_at: string;
-  verified?: string | null; // "buyer" when verified
+  verified?: string | null;
+  pictures?: { urls: { original?: string; medium?: string; thumb?: string } }[];
 }
 
 export async function getProductReviews(productId: string): Promise<ProductReviewsSummary> {
@@ -392,6 +394,9 @@ export async function getProductReviews(productId: string): Promise<ProductRevie
       body: (r.body ?? "").trim(),
       createdAt: r.created_at,
       verified: r.verified === "buyer",
+      photos: (r.pictures ?? [])
+        .map((p) => p.urls.medium ?? p.urls.original ?? "")
+        .filter(Boolean),
     }));
     const count = json.reviews_count ?? reviews.length;
     const average = json.rating ?? (reviews.length ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0);

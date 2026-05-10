@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, Star } from "lucide-react";
 import {
   Dialog,
@@ -9,12 +9,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  type CarouselApi,
-} from "@/components/ui/carousel";
 import {
   Accordion,
   AccordionContent,
@@ -94,20 +88,26 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
   const [size, setSize] = useState<string | null>(null);
   const [activeImage, setActiveImage] = useState(0);
   const [added, setAdded] = useState(false);
-  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [reviewsSummary, setReviewsSummary] = useState<ProductReviewsSummary | undefined>();
+  const mobileScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     getProductReviews(product.id).then(setReviewsSummary).catch(() => {});
   }, [product.id]);
 
-  useEffect(() => {
-    if (!carouselApi) return;
-    const onSelect = () => setCarouselIndex(carouselApi.selectedScrollSnap());
-    carouselApi.on("select", onSelect);
-    return () => { carouselApi.off("select", onSelect); };
-  }, [carouselApi]);
+  function scrollToMobileImage(index: number) {
+    const el = mobileScrollRef.current;
+    if (!el) return;
+    el.scrollTo({ left: el.clientWidth * index, behavior: "smooth" });
+    setCarouselIndex(index);
+  }
+
+  function handleMobileScroll() {
+    const el = mobileScrollRef.current;
+    if (!el) return;
+    setCarouselIndex(Math.round(el.scrollLeft / el.clientWidth));
+  }
 
   const variant = useMemo(
     () => (size ? findVariant(product, { [colourKey]: colour, [sizeKey]: size }) : undefined),
@@ -147,31 +147,33 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
         <div className="grid md:grid-cols-2 gap-8 md:gap-16">
           {/* Gallery */}
           <div className="fade-in-up [animation-delay:100ms]">
-            {/* Mobile — swipeable carousel */}
+            {/* Mobile — CSS scroll-snap carousel */}
             <div className="md:hidden">
-              <Carousel setApi={setCarouselApi} opts={{ loop: false }} className="w-full">
-                <CarouselContent className="-ml-0">
+              <div className="aspect-[4/5] overflow-hidden">
+                <div
+                  ref={mobileScrollRef}
+                  onScroll={handleMobileScroll}
+                  className="flex h-full overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                >
                   {product.images.map((img) => (
-                    <CarouselItem key={img.url} className="pl-0">
-                      <div className="aspect-[4/5] bg-muted overflow-hidden">
-                        <img
-                          src={img.url}
-                          alt={img.altText ?? product.title}
-                          width={img.width}
-                          height={img.height}
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
-                    </CarouselItem>
+                    <div key={img.url} className="flex-none w-full h-full snap-start bg-muted">
+                      <img
+                        src={img.url}
+                        alt={img.altText ?? product.title}
+                        width={img.width}
+                        height={img.height}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
                   ))}
-                </CarouselContent>
-              </Carousel>
+                </div>
+              </div>
               <div className="flex gap-2 mt-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {product.images.map((img, i) => (
                   <button
                     key={img.url}
                     type="button"
-                    onClick={() => carouselApi?.scrollTo(i)}
+                    onClick={() => scrollToMobileImage(i)}
                     className={`flex-none w-[17vw] aspect-square bg-muted overflow-hidden border transition-colors ${i === carouselIndex ? "border-ink" : "border-transparent"}`}
                     aria-label={`View image ${i + 1}`}
                   >
@@ -689,6 +691,26 @@ function ReviewsSection({ productId }: { productId: string }) {
                     <Stars rating={r.rating} />
                   </div>
                   <p className="text-foreground/85 leading-relaxed text-[15px]">{r.body}</p>
+                  {r.photos.length > 0 && (
+                    <div className="flex gap-2 mt-4 flex-wrap">
+                      {r.photos.map((src, idx) => (
+                        <a
+                          key={idx}
+                          href={src}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block w-16 h-16 md:w-20 md:h-20 bg-muted overflow-hidden flex-none"
+                        >
+                          <img
+                            src={src}
+                            alt={`Review photo ${idx + 1}`}
+                            loading="lazy"
+                            className="h-full w-full object-cover"
+                          />
+                        </a>
+                      ))}
+                    </div>
+                  )}
                   {(r.title || r.verified) && (
                     <p className="mt-3 text-xs uppercase tracking-[0.2em] text-muted-foreground">
                       {r.title && r.author}
