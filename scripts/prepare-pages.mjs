@@ -87,7 +87,7 @@ async function _judgemeProxy(request, env) {
       formParams.set("api_token", token);
       formParams.set("shop_domain", domain);
       formParams.set("platform", "shopify");
-      formParams.set("id", String(postProductId));
+      formParams.set("product_id", String(postProductId));
       formParams.set("name", payload.name || "Anonymous");
       formParams.set("email", payload.email);
       formParams.set("rating", String(payload.rating));
