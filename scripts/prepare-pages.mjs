@@ -73,7 +73,7 @@ async function _judgemeProxy(request, env) {
       const postRes = await _nativeFetch("https://judge.me/api/v1/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify({
+        body: JSON.stringify(Object.assign({
           api_token: token,
           shop_domain: domain,
           platform: "shopify",
@@ -83,7 +83,8 @@ async function _judgemeProxy(request, env) {
           rating: payload.rating,
           title: payload.title || "",
           body: payload.body || "",
-        }),
+        }, Array.isArray(payload.picture_urls) && payload.picture_urls.length > 0
+          ? { picture_urls: payload.picture_urls } : {})),
       });
       const responseText = await postRes.text();
       let errorMsg = "Something went wrong. Please try again.";

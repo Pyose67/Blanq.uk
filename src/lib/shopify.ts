@@ -414,7 +414,7 @@ export async function getProductReviews(productId: string): Promise<ProductRevie
 
 export async function addProductReview(
   productId: string,
-  input: { author: string; email: string; rating: number; title: string; body: string },
+  input: { author: string; email: string; rating: number; title: string; body: string; photos?: string[] },
 ): Promise<{ ok: boolean; error?: string }> {
   try {
     const numericId = gidToNumericId(productId);
@@ -427,6 +427,7 @@ export async function addProductReview(
         rating: input.rating,
         title: input.title,
         body: input.body,
+        ...(input.photos?.length ? { picture_urls: input.photos } : {}),
       }),
     });
     if (res.ok) return { ok: true };
