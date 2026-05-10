@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Tag, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import { formatMoney, getProductReviews, type ShopifyProduct } from "@/lib/shopify";
 
 export function ProductCard({ product }: { product: ShopifyProduct }) {
@@ -36,12 +36,8 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
           />
         )}
       </div>
-      <div className="mt-5 flex justify-between items-start gap-4">
+      <div className="mt-5 flex justify-between items-end gap-4">
         <div className="min-w-0">
-          <p className="eyebrow mb-1 inline-flex items-center gap-1.5">
-            <Tag className="h-3 w-3" strokeWidth={1.4} />
-            {product.productType}
-          </p>
           <h3 className="font-serif text-lg text-foreground truncate">{product.title}</h3>
           {avg && avg.count > 0 && (
             <div className="mt-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
