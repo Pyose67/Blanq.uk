@@ -86,6 +86,12 @@ async function _judgemeProxy(request, env) {
       }
       let payload = {};
       try { payload = await request.json(); } catch { /* ignore */ }
+      if (!payload.email) {
+        return new Response(JSON.stringify({ error: "Email is required" }), {
+          status: 400,
+          headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+        });
+      }
       const postRes = await _nativeFetch("https://judge.me/api/v1/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -94,9 +100,16 @@ async function _judgemeProxy(request, env) {
           shop_domain: domain,
           platform: "shopify",
           id: judgemeProductId,
+          // flat fields (some API versions)
+          name: payload.name || "Anonymous",
+          email: payload.email,
+          rating: payload.rating,
+          title: payload.title || "",
+          body: payload.body || "",
+          // nested fields (other API versions)
           reviewer: {
             name: payload.name || "Anonymous",
-            email: payload.email || "",
+            email: payload.email,
             accepts_marketing: false,
           },
           review: {
