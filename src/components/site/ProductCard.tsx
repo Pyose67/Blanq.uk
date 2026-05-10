@@ -1,11 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Palette, Tag, Star } from "lucide-react";
+import { Tag, Star } from "lucide-react";
 import { formatMoney, getProductReviews, type ShopifyProduct } from "@/lib/shopify";
 
 export function ProductCard({ product }: { product: ShopifyProduct }) {
   const image = product.images?.[0];
-  const colourOption = product.options?.find((o) => /colou?r/i.test(o.name));
   const [avg, setAvg] = useState<{ average: number; count: number } | null>(null);
 
   useEffect(() => {
@@ -36,18 +35,6 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
             className="h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.04]"
           />
         )}
-        <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-700 bg-background/90 backdrop-blur-sm py-3 px-4 text-[11px] uppercase tracking-[0.18em] text-foreground/80 flex justify-between items-center">
-          <span className="inline-flex items-center gap-1.5">
-            <Tag className="h-3 w-3" strokeWidth={1.4} />
-            {product.productType || product.vendor}
-          </span>
-          {colourOption && (
-            <span className="inline-flex items-center gap-1.5">
-              <Palette className="h-3 w-3" strokeWidth={1.4} />
-              {colourOption.values.length} {colourOption.values.length === 1 ? "colour" : "colours"}
-            </span>
-          )}
-        </div>
       </div>
       <div className="mt-5 flex justify-between items-start gap-4">
         <div className="min-w-0">
