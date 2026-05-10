@@ -70,6 +70,23 @@ async function _judgemeProxy(request, env) {
           headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
         });
       }
+      const hostedUrls = [];
+      const imgbbKey = env.IMGBB_API_KEY || "";
+      if (imgbbKey && Array.isArray(payload.picture_urls) && payload.picture_urls.length > 0) {
+        for (const dataUrl of payload.picture_urls) {
+          try {
+            const base64 = String(dataUrl).includes(",") ? String(dataUrl).split(",")[1] : String(dataUrl);
+            const imgForm = new FormData();
+            imgForm.append("key", imgbbKey);
+            imgForm.append("image", base64);
+            const imgRes = await _nativeFetch("https://api.imgbb.com/1/upload", { method: "POST", body: imgForm });
+            if (imgRes.ok) {
+              const imgData = await imgRes.json();
+              if (imgData && imgData.data && imgData.data.url) hostedUrls.push(imgData.data.url);
+            }
+          } catch { /* skip failed photo */ }
+        }
+      }
       const postRes = await _nativeFetch("https://judge.me/api/v1/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
@@ -83,8 +100,7 @@ async function _judgemeProxy(request, env) {
           rating: payload.rating,
           title: payload.title || "",
           body: payload.body || "",
-        }, Array.isArray(payload.picture_urls) && payload.picture_urls.length > 0
-          ? { picture_urls: payload.picture_urls } : {})),
+        }, hostedUrls.length > 0 ? { picture_urls: hostedUrls } : {})),
       });
       const responseText = await postRes.text();
       let errorMsg = "Something went wrong. Please try again.";
