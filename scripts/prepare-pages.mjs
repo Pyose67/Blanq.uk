@@ -94,15 +94,15 @@ async function _judgemeProxy(request, env) {
       }
       const enc = encodeURIComponent;
       const formBody = [
-        `api_token=${enc(token)}`,
-        `shop_domain=${enc(domain)}`,
-        `platform=shopify`,
-        `id=${judgemeProductId}`,
-        `reviewer[name]=${enc(payload.name || "Anonymous")}`,
-        `reviewer[email]=${enc(payload.email)}`,
-        `review[rating]=${enc(String(payload.rating))}`,
-        `review[title]=${enc(payload.title || "")}`,
-        `review[body]=${enc(payload.body || "")}`,
+        "api_token=" + enc(token),
+        "shop_domain=" + enc(domain),
+        "platform=shopify",
+        "id=" + judgemeProductId,
+        "reviewer[name]=" + enc(payload.name || "Anonymous"),
+        "reviewer[email]=" + enc(payload.email),
+        "review[rating]=" + enc(String(payload.rating)),
+        "review[title]=" + enc(payload.title || ""),
+        "review[body]=" + enc(payload.body || ""),
       ].join("&");
       const postRes = await _nativeFetch("https://judge.me/api/v1/reviews", {
         method: "POST",
