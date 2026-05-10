@@ -148,15 +148,15 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
           {/* Gallery */}
           <div className="fade-in-up [animation-delay:100ms]">
             {/* Mobile — CSS scroll-snap carousel */}
-            <div className="md:hidden">
-              <div className="aspect-[4/5] overflow-hidden">
+            <div className="md:hidden w-full overflow-hidden">
+              <div className="aspect-[4/5]">
                 <div
                   ref={mobileScrollRef}
                   onScroll={handleMobileScroll}
-                  className="flex h-full overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                  className="flex h-full w-full overflow-x-scroll snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                 >
                   {product.images.map((img) => (
-                    <div key={img.url} className="flex-none w-full h-full snap-start bg-muted">
+                    <div key={img.url} className="flex-none w-full h-full snap-start shrink-0 bg-muted">
                       <img
                         src={img.url}
                         alt={img.altText ?? product.title}
@@ -174,7 +174,7 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
                     key={img.url}
                     type="button"
                     onClick={() => scrollToMobileImage(i)}
-                    className={`flex-none w-[17vw] aspect-square bg-muted overflow-hidden border transition-colors ${i === carouselIndex ? "border-ink" : "border-transparent"}`}
+                    className={`flex-none w-[calc((100%-48px)/5.3)] aspect-square bg-muted overflow-hidden border transition-colors ${i === carouselIndex ? "border-ink" : "border-transparent"}`}
                     aria-label={`View image ${i + 1}`}
                   >
                     <img src={img.url} alt="" loading="lazy" className="h-full w-full object-cover" />
