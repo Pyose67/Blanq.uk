@@ -77,22 +77,26 @@ async function _judgemeProxy(request, env) {
         const lr = await _nativeFetch(lookupUrl);
         if (lr.ok) { const ld = await lr.json(); postProductId = ld?.product?.id ?? null; }
       } catch { /* proceed without product id */ }
+      if (!postProductId) {
+        return new Response(
+          JSON.stringify({ error: "DEBUG: product lookup returned null. Check JUDGEME_PRIVATE_TOKEN env var." }),
+          { status: 500, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } }
+        );
+      }
+      const formParams = new URLSearchParams();
+      formParams.set("api_token", token);
+      formParams.set("shop_domain", domain);
+      formParams.set("platform", "shopify");
+      formParams.set("id", String(postProductId));
+      formParams.set("name", payload.name || "Anonymous");
+      formParams.set("email", payload.email);
+      formParams.set("rating", String(payload.rating));
+      formParams.set("title", payload.title || "");
+      formParams.set("body", payload.body || "");
       const postRes = await _nativeFetch("https://judge.me/api/v1/reviews", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify({
-          api_token: token,
-          shop_domain: domain,
-          platform: "shopify",
-          id: postProductId,
-          email: payload.email,
-          name: payload.name || "Anonymous",
-          rating: payload.rating,
-          title: payload.title || "",
-          body: payload.body || "",
-          reviewer: { email: payload.email, name: payload.name || "Anonymous" },
-          review: { rating: payload.rating, title: payload.title || "", body: payload.body || "" },
-        }),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formParams.toString(),
       });
       const responseText = await postRes.text();
       let errorMsg = "Something went wrong. Please try again.";
@@ -103,7 +107,7 @@ async function _judgemeProxy(request, env) {
         } catch { errorMsg = responseText; }
       }
       return new Response(
-        postRes.ok ? JSON.stringify({ ok: true }) : JSON.stringify({ error: errorMsg }),
+        postRes.ok ? JSON.stringify({ ok: true, _pid: postProductId }) : JSON.stringify({ error: errorMsg }),
         {
           status: postRes.ok ? 200 : postRes.status,
           headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
