@@ -72,11 +72,11 @@ async function _judgemeProxy(request, env) {
       }
       const hostedUrls = [];
       if (env.REVIEW_PHOTOS && Array.isArray(payload.picture_urls) && payload.picture_urls.length > 0) {
-        const r2Base = (env.R2_PUBLIC_URL || "").replace(/\/$/, "");
+        const r2Base = (env.R2_PUBLIC_URL || "").replace(/\\/$/, "");
         for (const dataUrl of payload.picture_urls) {
           try {
             const s = String(dataUrl);
-            const mimeMatch = s.match(/^data:(image\/[a-z]+);base64,/);
+            const mimeMatch = s.match(/^data:(image\\/[a-z]+);base64,/);
             const mime = mimeMatch ? mimeMatch[1] : "image/jpeg";
             const ext = mime.split("/")[1] || "jpg";
             const b64 = s.includes(",") ? s.split(",")[1] : s;
