@@ -60,7 +60,8 @@ export interface ShopifyProduct {
     sizeGuide: SizeGuideRow[] | null;
     materialProps: { title: string; body: string }[] | null;
     techNotes: { label: string; value: string }[] | null;
-    fitNotes: string | null; // pre-rendered HTML from rich_text metafield
+    fitNotes: string | null;
+    careInstructions: string[] | null;
   };
 }
 
@@ -180,6 +181,7 @@ sizeGuide: metafield(namespace: "custom", key: "size_guide") { value type }
   materialProps: metafield(namespace: "custom", key: "propriedades_do_material") { value type }
   techNotes: metafield(namespace: "custom", key: "tech_notes") { value type }
   fitNotes: metafield(namespace: "custom", key: "fit_notes") { value type }
+  careInstructions: metafield(namespace: "custom", key: "care_instructions") { value type }
 `;
 
 const PRODUCTS_QUERY = `
@@ -252,6 +254,7 @@ function normalizeProduct(node: any): ShopifyProduct {
       materialProps: parseJsonMetafield<{ title: string; body: string }[]>(node.materialProps),
       techNotes: parseJsonMetafield<{ label: string; value: string }[]>(node.techNotes),
       fitNotes: parseRichTextMetafield(node.fitNotes),
+      careInstructions: parseJsonMetafield<string[]>(node.careInstructions),
     },
   };
 }

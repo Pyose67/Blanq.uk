@@ -345,7 +345,7 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
             </p>
 
             {/* Product Details — collapsible */}
-            {((product.metafields.materialProps?.length ?? 0) > 0 || (product.metafields.techNotes?.length ?? 0) > 0) && (
+            {((product.metafields.materialProps?.length ?? 0) > 0 || (product.metafields.techNotes?.length ?? 0) > 0 || (product.metafields.careInstructions?.length ?? 0) > 0) && (
               <div className="mt-8 border-t border-border">
                 <Accordion type="single" collapsible>
                   <AccordionItem value="details" className="border-none">
@@ -377,6 +377,16 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
                               </div>
                             ))}
                           </dl>
+                        </div>
+                      )}
+                      {(product.metafields.careInstructions?.length ?? 0) > 0 && (
+                        <div className={`pb-6 ${(product.metafields.materialProps?.length ?? 0) > 0 || (product.metafields.techNotes?.length ?? 0) > 0 ? "pt-6 border-t border-border" : ""}`}>
+                          <p className="eyebrow mb-4 !text-foreground/60">Care Instructions</p>
+                          <ul className="divide-y divide-border border-t border-border">
+                            {product.metafields.careInstructions!.map((item, i) => (
+                              <li key={i} className="py-3 text-sm text-foreground/90">{item}</li>
+                            ))}
+                          </ul>
                         </div>
                       )}
                     </AccordionContent>
