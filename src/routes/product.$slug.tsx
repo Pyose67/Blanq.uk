@@ -375,53 +375,58 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
               United Kingdom. Considered returns within thirty days.
             </p>
 
-            {/* Product Details — collapsible */}
+            {/* Collapsible sections */}
             {((product.metafields.materialProps?.length ?? 0) > 0 || (product.metafields.techNotes?.length ?? 0) > 0 || (product.metafields.careInstructions?.length ?? 0) > 0) && (
               <div className="mt-8 border-t border-border">
-                <Accordion type="single" collapsible>
-                  <AccordionItem value="details" className="border-none">
-                    <AccordionTrigger className="eyebrow !text-foreground py-5 hover:no-underline">
-                      Product Details
-                    </AccordionTrigger>
-                    <AccordionContent className="pb-0">
-                      {(product.metafields.materialProps?.length ?? 0) > 0 && (
-                        <div className="pb-6">
-                          <p className="eyebrow mb-4 !text-foreground/60">Material Properties</p>
-                          <ul className="space-y-5">
-                            {product.metafields.materialProps!.map((p) => (
-                              <li key={p.title}>
-                                <p className="font-serif text-base text-ink">{p.title}</p>
-                                <p className="text-sm text-muted-foreground leading-relaxed mt-1">{p.body}</p>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                      {(product.metafields.techNotes?.length ?? 0) > 0 && (
-                        <div className={`pb-6 ${(product.metafields.materialProps?.length ?? 0) > 0 ? "pt-6 border-t border-border" : ""}`}>
-                          <p className="eyebrow mb-4 !text-foreground/60">Technical Notes</p>
-                          <dl className="divide-y divide-border border-t border-border">
-                            {product.metafields.techNotes!.map((s) => (
-                              <div key={s.label} className="grid grid-cols-3 py-3 gap-4">
-                                <dt className="eyebrow !text-foreground/60">{s.label}</dt>
-                                <dd className="col-span-2 text-foreground/90 text-sm">{s.value}</dd>
-                              </div>
-                            ))}
-                          </dl>
-                        </div>
-                      )}
-                      {(product.metafields.careInstructions?.length ?? 0) > 0 && (
-                        <div className={`pb-6 ${(product.metafields.materialProps?.length ?? 0) > 0 || (product.metafields.techNotes?.length ?? 0) > 0 ? "pt-6 border-t border-border" : ""}`}>
-                          <p className="eyebrow mb-4 !text-foreground/60">Care Instructions</p>
-                          <ul className="divide-y divide-border border-t border-border">
-                            {product.metafields.careInstructions!.map((item, i) => (
-                              <li key={i} className="py-3 text-sm text-foreground/90">{item}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </AccordionContent>
-                  </AccordionItem>
+                <Accordion type="multiple">
+                  {(product.metafields.materialProps?.length ?? 0) > 0 && (
+                    <AccordionItem value="details" className="border-none border-b border-border">
+                      <AccordionTrigger className="eyebrow !text-foreground py-5 hover:no-underline">
+                        Product Details
+                      </AccordionTrigger>
+                      <AccordionContent className="pb-6">
+                        <ul className="space-y-5">
+                          {product.metafields.materialProps!.map((p) => (
+                            <li key={p.title}>
+                              <p className="font-serif text-base text-ink">{p.title}</p>
+                              <p className="text-sm text-muted-foreground leading-relaxed mt-1">{p.body}</p>
+                            </li>
+                          ))}
+                        </ul>
+                      </AccordionContent>
+                    </AccordionItem>
+                  )}
+                  {(product.metafields.techNotes?.length ?? 0) > 0 && (
+                    <AccordionItem value="tech" className="border-none border-b border-border">
+                      <AccordionTrigger className="eyebrow !text-foreground py-5 hover:no-underline">
+                        Technical Notes
+                      </AccordionTrigger>
+                      <AccordionContent className="pb-6">
+                        <dl className="divide-y divide-border border-t border-border">
+                          {product.metafields.techNotes!.map((s) => (
+                            <div key={s.label} className="grid grid-cols-3 py-3 gap-4">
+                              <dt className="eyebrow !text-foreground/60">{s.label}</dt>
+                              <dd className="col-span-2 text-foreground/90 text-sm">{s.value}</dd>
+                            </div>
+                          ))}
+                        </dl>
+                      </AccordionContent>
+                    </AccordionItem>
+                  )}
+                  {(product.metafields.careInstructions?.length ?? 0) > 0 && (
+                    <AccordionItem value="care" className="border-none">
+                      <AccordionTrigger className="eyebrow !text-foreground py-5 hover:no-underline">
+                        Care Instructions
+                      </AccordionTrigger>
+                      <AccordionContent className="pb-6">
+                        <ul className="divide-y divide-border border-t border-border">
+                          {product.metafields.careInstructions!.map((item, i) => (
+                            <li key={i} className="py-3 text-sm text-foreground/90">{item}</li>
+                          ))}
+                        </ul>
+                      </AccordionContent>
+                    </AccordionItem>
+                  )}
                 </Accordion>
               </div>
             )}
