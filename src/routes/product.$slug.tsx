@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronDown, Star } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, Star, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -86,12 +86,12 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
 
   const [colour, setColour] = useState<string>(colourOption?.values[0] ?? "");
   const [size, setSize] = useState<string | null>(null);
-  const [activeImage, setActiveImage] = useState(0);
   const [added, setAdded] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [reviewsSummary, setReviewsSummary] = useState<ProductReviewsSummary | undefined>();
   const mobileScrollRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLButtonElement>(null);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [ctaVisible, setCtaVisible] = useState(true);
 
   useEffect(() => {
@@ -114,8 +114,8 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
   }, []);
 
   useEffect(() => {
-    setActiveImage(0);
     setCarouselIndex(0);
+    setLightboxIndex(null);
     mobileScrollRef.current?.scrollTo({ left: 0, behavior: "instant" });
   }, [colour]);
 
@@ -204,14 +204,14 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
                   onScroll={handleMobileScroll}
                   className="flex h-full w-full overflow-x-scroll snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                 >
-                  {filteredImages.map((img) => (
-                    <div key={img.url} className="flex-none w-full h-full snap-start shrink-0 bg-muted">
+                  {filteredImages.map((img, i) => (
+                    <div key={img.url} className="flex-none w-full h-full snap-start shrink-0 bg-muted" onClick={() => setLightboxIndex(i)}>
                       <img
                         src={img.url}
                         alt={img.altText ?? product.title}
                         width={img.width}
                         height={img.height}
-                        className="h-full w-full object-cover"
+                        className="h-full w-full object-cover cursor-zoom-in"
                       />
                     </div>
                   ))}
@@ -232,30 +232,24 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
               </div>
             </div>
 
-            {/* Desktop — static stack */}
-            <div className="hidden md:block space-y-4">
-              <div className="aspect-[4/5] bg-muted overflow-hidden">
-                <img
-                  src={filteredImages[activeImage].url}
-                  alt={filteredImages[activeImage].altText ?? product.title}
-                  width={filteredImages[activeImage].width}
-                  height={filteredImages[activeImage].height}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                {filteredImages.map((img, i) => (
-                  <button
-                    key={img.url}
-                    type="button"
-                    onClick={() => setActiveImage(i)}
-                    className={`aspect-square bg-muted overflow-hidden border ${i === activeImage ? "border-ink" : "border-transparent"}`}
-                    aria-label={`View image ${i + 1}`}
-                  >
-                    <img src={img.url} alt="" loading="lazy" className="h-full w-full object-cover" />
-                  </button>
-                ))}
-              </div>
+            {/* Desktop — stacked full-size gallery */}
+            <div className="hidden md:flex flex-col gap-3">
+              {filteredImages.map((img, i) => (
+                <div
+                  key={img.url}
+                  className="aspect-[4/5] bg-muted overflow-hidden cursor-zoom-in"
+                  onClick={() => setLightboxIndex(i)}
+                >
+                  <img
+                    src={img.url}
+                    alt={img.altText ?? product.title}
+                    width={img.width}
+                    height={img.height}
+                    loading={i === 0 ? "eager" : "lazy"}
+                    className="h-full w-full object-cover transition-transform duration-700 hover:scale-[1.02]"
+                  />
+                </div>
+              ))}
             </div>
           </div>
 
@@ -491,6 +485,14 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
         </section>
       )}
 
+      {lightboxIndex !== null && (
+        <ImageLightbox
+          images={filteredImages.map((img) => ({ url: img.url, alt: img.altText ?? product.title }))}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+        />
+      )}
+
       {/* Sticky CTA — only after the main button has been seen and scrolled away */}
       <div
         className={[
@@ -678,6 +680,7 @@ function SizeGuideDialog({ product }: { product: ShopifyProduct }) {
 function ReviewsSection({ productId }: { productId: string }) {
   const [data, setData] = useState<ProductReviewsSummary | undefined>(undefined);
   const [open, setOpen] = useState(false);
+  const [reviewLightbox, setReviewLightbox] = useState<{ images: { url: string; alt: string }[]; index: number } | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -731,6 +734,7 @@ function ReviewsSection({ productId }: { productId: string }) {
   const hasReviews = data.count > 0;
 
   return (
+    <>
     <section id="reviews" className="mx-auto max-w-[1480px] px-5 md:px-10 py-20 md:py-32">
       <div className="grid md:grid-cols-12 gap-10">
         <div className="md:col-span-4 md:sticky md:top-28 md:self-start">
@@ -874,12 +878,14 @@ function ReviewsSection({ productId }: { productId: string }) {
                   {r.photos.length > 0 && (
                     <div className="flex gap-2 mt-4 flex-wrap">
                       {r.photos.map((src, idx) => (
-                        <a
+                        <button
                           key={idx}
-                          href={src}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="block w-16 h-16 md:w-20 md:h-20 bg-muted overflow-hidden flex-none"
+                          type="button"
+                          onClick={() => setReviewLightbox({
+                            images: r.photos.map((s, j) => ({ url: s, alt: `Review photo ${j + 1}` })),
+                            index: idx,
+                          })}
+                          className="block w-16 h-16 md:w-20 md:h-20 bg-muted overflow-hidden flex-none cursor-zoom-in"
                         >
                           <img
                             src={src}
@@ -887,7 +893,7 @@ function ReviewsSection({ productId }: { productId: string }) {
                             loading="lazy"
                             className="h-full w-full object-cover"
                           />
-                        </a>
+                        </button>
                       ))}
                     </div>
                   )}
@@ -914,6 +920,15 @@ function ReviewsSection({ productId }: { productId: string }) {
         </div>
       </div>
     </section>
+
+    {reviewLightbox && (
+      <ImageLightbox
+        images={reviewLightbox.images}
+        initialIndex={reviewLightbox.index}
+        onClose={() => setReviewLightbox(null)}
+      />
+    )}
+  </>
   );
 }
 
@@ -929,6 +944,206 @@ function Stars({ rating }: { rating: number }) {
         />
       ))}
     </span>
+  );
+}
+
+// =====================================================================
+// Image Lightbox — pinch-zoom (mobile) + click-zoom + drag (desktop)
+// =====================================================================
+
+type LightboxImage = { url: string; alt: string };
+
+function ImageLightbox({
+  images,
+  initialIndex,
+  onClose,
+}: {
+  images: LightboxImage[];
+  initialIndex: number;
+  onClose: () => void;
+}) {
+  const [idx, setIdx] = useState(initialIndex);
+  const [scale, setScaleState] = useState(1);
+  const [offset, setOffsetState] = useState({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
+  const scaleRef = useRef(1);
+  const offsetRef = useRef({ x: 0, y: 0 });
+
+  function setScale(v: number) { scaleRef.current = v; setScaleState(v); }
+  function setOffset(v: { x: number; y: number }) { offsetRef.current = v; setOffsetState(v); }
+  function resetZoom() { setScale(1); setOffset({ x: 0, y: 0 }); }
+  function go(dir: number) {
+    setIdx((i) => (i + dir + images.length) % images.length);
+    setScale(1); setOffset({ x: 0, y: 0 });
+  }
+
+  // keyboard
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowLeft") go(-1);
+      if (e.key === "ArrowRight") go(1);
+    };
+    window.addEventListener("keydown", fn);
+    return () => window.removeEventListener("keydown", fn);
+  }, []);
+
+  // lock scroll + non-passive touchmove
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const el = containerRef.current;
+    const prevent = (e: TouchEvent) => e.preventDefault();
+    el?.addEventListener("touchmove", prevent, { passive: false });
+    return () => {
+      document.body.style.overflow = prev;
+      el?.removeEventListener("touchmove", prevent);
+    };
+  }, []);
+
+  // ── touch state refs ──────────────────────────────────────────────
+  const touch = useRef({ pinching: false, lastDist: 0, lastScale: 1, startOx: 0, startOy: 0, dragging: false, startX: 0, startY: 0, swipeX: 0 });
+
+  function onTouchStart(e: React.TouchEvent) {
+    const t = touch.current;
+    if (e.touches.length === 2) {
+      t.pinching = true; t.dragging = false;
+      const dx = e.touches[1].clientX - e.touches[0].clientX;
+      const dy = e.touches[1].clientY - e.touches[0].clientY;
+      t.lastDist = Math.hypot(dx, dy);
+      t.lastScale = scaleRef.current;
+      t.startOx = offsetRef.current.x; t.startOy = offsetRef.current.y;
+    } else if (e.touches.length === 1) {
+      t.pinching = false;
+      t.swipeX = e.touches[0].clientX;
+      if (scaleRef.current > 1) {
+        t.dragging = true;
+        t.startX = e.touches[0].clientX; t.startY = e.touches[0].clientY;
+        t.startOx = offsetRef.current.x; t.startOy = offsetRef.current.y;
+      } else { t.dragging = false; }
+    }
+  }
+
+  function onTouchMove(e: React.TouchEvent) {
+    const t = touch.current;
+    if (e.touches.length === 2 && t.pinching) {
+      const dx = e.touches[1].clientX - e.touches[0].clientX;
+      const dy = e.touches[1].clientY - e.touches[0].clientY;
+      const newScale = Math.min(4, Math.max(1, t.lastScale * (Math.hypot(dx, dy) / t.lastDist)));
+      setScale(newScale);
+      if (newScale <= 1) setOffset({ x: 0, y: 0 });
+    } else if (e.touches.length === 1 && t.dragging) {
+      setOffset({ x: t.startOx + e.touches[0].clientX - t.startX, y: t.startOy + e.touches[0].clientY - t.startY });
+    }
+  }
+
+  function onTouchEnd(e: React.TouchEvent) {
+    const t = touch.current;
+    if (scaleRef.current < 1.05) resetZoom();
+    if (!t.pinching && e.changedTouches.length === 1 && scaleRef.current <= 1) {
+      const delta = e.changedTouches[0].clientX - t.swipeX;
+      if (Math.abs(delta) > 55) go(delta < 0 ? 1 : -1);
+    }
+    t.pinching = false; t.dragging = false;
+  }
+
+  // ── mouse state refs ──────────────────────────────────────────────
+  const mouse = useRef({ down: false, moved: false, startX: 0, startY: 0, startOx: 0, startOy: 0 });
+
+  function onMouseDown(e: React.MouseEvent) {
+    const m = mouse.current;
+    m.down = true; m.moved = false;
+    m.startX = e.clientX; m.startY = e.clientY;
+    m.startOx = offsetRef.current.x; m.startOy = offsetRef.current.y;
+  }
+
+  function onMouseMove(e: React.MouseEvent) {
+    const m = mouse.current;
+    if (!m.down) return;
+    if (Math.abs(e.clientX - m.startX) > 4 || Math.abs(e.clientY - m.startY) > 4) {
+      m.moved = true;
+      if (scaleRef.current > 1) setOffset({ x: m.startOx + e.clientX - m.startX, y: m.startOy + e.clientY - m.startY });
+    }
+  }
+
+  function onMouseUp(e: React.MouseEvent) {
+    const m = mouse.current;
+    m.down = false;
+    if (!m.moved) {
+      if (scaleRef.current > 1) {
+        resetZoom();
+      } else {
+        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+        setScale(2.5);
+        setOffset({ x: -(e.clientX - rect.left - rect.width / 2), y: -(e.clientY - rect.top - rect.height / 2) });
+      }
+    }
+  }
+
+  const img = images[idx];
+  const grabbed = mouse.current.down && mouse.current.moved;
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/92" onClick={onClose}>
+      <button type="button" onClick={onClose}
+        className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
+        <X className="h-6 w-6" strokeWidth={1.2} />
+      </button>
+
+      {images.length > 1 && (
+        <p className="absolute top-5 left-1/2 -translate-x-1/2 z-10 text-[11px] uppercase tracking-[0.22em] text-white/40 select-none pointer-events-none">
+          {idx + 1} / {images.length}
+        </p>
+      )}
+
+      {images.length > 1 && <>
+        <button type="button" onClick={(e) => { e.stopPropagation(); go(-1); }}
+          className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center text-white/60 hover:text-white transition-colors">
+          <ChevronLeft className="h-7 w-7" strokeWidth={1.2} />
+        </button>
+        <button type="button" onClick={(e) => { e.stopPropagation(); go(1); }}
+          className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center text-white/60 hover:text-white transition-colors">
+          <ChevronRight className="h-7 w-7" strokeWidth={1.2} />
+        </button>
+      </>}
+
+      <div
+        ref={containerRef}
+        className="absolute inset-0 flex items-center justify-center overflow-hidden select-none"
+        style={{ cursor: scale > 1 ? (grabbed ? "grabbing" : "grab") : "zoom-in" }}
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseUp={onMouseUp}
+        onMouseLeave={() => { mouse.current.down = false; }}
+      >
+        <img
+          key={img.url}
+          src={img.url}
+          alt={img.alt}
+          draggable={false}
+          className="max-w-full max-h-full object-contain pointer-events-none"
+          style={{
+            transform: `scale(${scale}) translate(${offset.x / scale}px, ${offset.y / scale}px)`,
+            transition: scale === 1 ? "transform 0.25s ease" : "none",
+          }}
+        />
+      </div>
+
+      {images.length > 1 && (
+        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+          {images.map((_, i) => (
+            <button key={i} type="button"
+              onClick={(e) => { e.stopPropagation(); setIdx(i); resetZoom(); }}
+              className={`w-1.5 h-1.5 rounded-full transition-colors ${i === idx ? "bg-white" : "bg-white/35"}`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
