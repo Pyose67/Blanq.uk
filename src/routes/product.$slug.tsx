@@ -93,7 +93,6 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
   const mobileScrollRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLButtonElement>(null);
   const [ctaVisible, setCtaVisible] = useState(true);
-  const [ctaHasBeenSeen, setCtaHasBeenSeen] = useState(false);
 
   useEffect(() => {
     getProductReviews(product.id).then(setReviewsSummary).catch(() => {});
@@ -103,8 +102,12 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
     const el = ctaRef.current;
     if (!el) return;
     const obs = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) setCtaHasBeenSeen(true);
-      setCtaVisible(entry.isIntersecting);
+      if (entry.isIntersecting) {
+        setCtaVisible(true);
+      } else {
+        // só esconde (mostra sticky) se o botão saiu pelo topo
+        setCtaVisible(entry.boundingClientRect.top > 0);
+      }
     }, { threshold: 0 });
     obs.observe(el);
     return () => obs.disconnect();
@@ -492,7 +495,7 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
       <div
         className={[
           "fixed bottom-0 inset-x-0 z-40 transition-transform duration-300 ease-in-out",
-          ctaHasBeenSeen && !ctaVisible ? "translate-y-0" : "translate-y-full",
+          !ctaVisible ? "translate-y-0" : "translate-y-full",
         ].join(" ")}
       >
         <div className="bg-background/95 backdrop-blur-md border-t border-border shadow-[0_-4px_24px_rgba(0,0,0,0.06)]">
