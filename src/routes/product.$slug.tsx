@@ -93,6 +93,7 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
   const mobileScrollRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLButtonElement>(null);
   const [ctaVisible, setCtaVisible] = useState(true);
+  const [ctaHasBeenSeen, setCtaHasBeenSeen] = useState(false);
 
   useEffect(() => {
     getProductReviews(product.id).then(setReviewsSummary).catch(() => {});
@@ -101,7 +102,10 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
   useEffect(() => {
     const el = ctaRef.current;
     if (!el) return;
-    const obs = new IntersectionObserver(([entry]) => setCtaVisible(entry.isIntersecting), { threshold: 0 });
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) setCtaHasBeenSeen(true);
+      setCtaVisible(entry.isIntersecting);
+    }, { threshold: 0 });
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
@@ -484,34 +488,87 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
         </section>
       )}
 
-      {/* Sticky CTA — slides up when the main button scrolls out of view */}
+      {/* Sticky CTA — only after the main button has been seen and scrolled away */}
       <div
         className={[
           "fixed bottom-0 inset-x-0 z-40 transition-transform duration-300 ease-in-out",
-          ctaVisible ? "translate-y-full" : "translate-y-0",
+          ctaHasBeenSeen && !ctaVisible ? "translate-y-0" : "translate-y-full",
         ].join(" ")}
       >
         <div className="bg-background/95 backdrop-blur-md border-t border-border shadow-[0_-4px_24px_rgba(0,0,0,0.06)]">
-          <div className="mx-auto max-w-[1480px] px-5 md:px-10 py-3 flex items-center gap-4">
-            <div className="hidden md:block min-w-0 flex-1">
-              <p className="font-serif text-base text-ink truncate">{product.title}</p>
-              <p className="text-xs tabular-nums text-foreground/70 mt-0.5">{formatMoney(displayPrice)}</p>
+          <div className="mx-auto max-w-[1480px] px-5 md:px-10 py-3">
+            {/* Desktop */}
+            <div className="hidden md:flex items-center gap-4">
+              <div className="min-w-0 flex-1">
+                <p className="font-serif text-base text-ink truncate">{product.title}</p>
+                <p className="text-xs tabular-nums text-foreground/70 mt-0.5">{formatMoney(displayPrice)}</p>
+              </div>
+              {sizeOption && (
+                <div className="relative">
+                  <select
+                    value={size ?? ""}
+                    onChange={(e) => setSize(e.target.value || null)}
+                    className="appearance-none bg-transparent border border-border py-2.5 pl-3 pr-8 text-[11px] uppercase tracking-[0.18em] focus:outline-none focus:border-foreground cursor-pointer"
+                  >
+                    <option value="" disabled>Size</option>
+                    {sizeOption.values.map((s) => {
+                      const v = findVariant(product, { [colourKey]: colour, [sizeKey]: s });
+                      return (
+                        <option key={s} value={s} disabled={!!(v && !v.availableForSale)}>
+                          {s}{v && !v.availableForSale ? " — Sold out" : ""}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-foreground/60" strokeWidth={1.4} />
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                disabled={ctaDisabled}
+                className={[
+                  "shrink-0 px-8 py-3 text-[11px] uppercase tracking-[0.28em] transition-colors",
+                  ctaDisabled ? "bg-disabled text-offwhite cursor-not-allowed" : "bg-ink text-offwhite hover:bg-ink/90",
+                ].join(" ")}
+              >
+                {ctaLabel}
+              </button>
             </div>
-            <p className="md:hidden text-sm tabular-nums text-foreground/80 shrink-0">{formatMoney(displayPrice)}</p>
-            <button
-              type="button"
-              onClick={handleAddToCart}
-              disabled={ctaDisabled}
-              className={[
-                "shrink-0 px-8 py-3.5 text-[11px] uppercase tracking-[0.28em] transition-colors",
-                "w-full md:w-auto",
-                ctaDisabled
-                  ? "bg-disabled text-offwhite cursor-not-allowed"
-                  : "bg-ink text-offwhite hover:bg-ink/90",
-              ].join(" ")}
-            >
-              {ctaLabel}
-            </button>
+            {/* Mobile */}
+            <div className="flex md:hidden items-center gap-2">
+              {sizeOption && (
+                <div className="relative flex-1 min-w-0">
+                  <select
+                    value={size ?? ""}
+                    onChange={(e) => setSize(e.target.value || null)}
+                    className="w-full appearance-none bg-transparent border border-border py-3 pl-3 pr-7 text-[11px] uppercase tracking-[0.14em] focus:outline-none focus:border-foreground cursor-pointer"
+                  >
+                    <option value="" disabled>Select size</option>
+                    {sizeOption.values.map((s) => {
+                      const v = findVariant(product, { [colourKey]: colour, [sizeKey]: s });
+                      return (
+                        <option key={s} value={s} disabled={!!(v && !v.availableForSale)}>
+                          {s}{v && !v.availableForSale ? " — Sold out" : ""}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-foreground/60" strokeWidth={1.4} />
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                disabled={ctaDisabled}
+                className={[
+                  "shrink-0 px-5 py-3 text-[11px] uppercase tracking-[0.2em] transition-colors",
+                  ctaDisabled ? "bg-disabled text-offwhite cursor-not-allowed" : "bg-ink text-offwhite hover:bg-ink/90",
+                ].join(" ")}
+              >
+                {added ? "Added" : "Add to bag"}
+              </button>
+            </div>
           </div>
         </div>
       </div>
