@@ -91,10 +91,20 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [reviewsSummary, setReviewsSummary] = useState<ProductReviewsSummary | undefined>();
   const mobileScrollRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLButtonElement>(null);
+  const [ctaVisible, setCtaVisible] = useState(true);
 
   useEffect(() => {
     getProductReviews(product.id).then(setReviewsSummary).catch(() => {});
   }, [product.id]);
+
+  useEffect(() => {
+    const el = ctaRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([entry]) => setCtaVisible(entry.isIntersecting), { threshold: 0 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   useEffect(() => {
     setActiveImage(0);
@@ -143,6 +153,21 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
       : variantUnavailable
         ? "Sold out"
         : "Add to bag";
+
+  function handleAddToCart() {
+    if (!variant || ctaDisabled) return;
+    addItem({
+      slug: product.handle,
+      variantId: variant.id,
+      name: product.title,
+      image: product.images[0].url,
+      size: size!,
+      colour,
+      price: Number(variant.price.amount),
+    });
+    setAdded(true);
+    setTimeout(() => setAdded(false), 2400);
+  }
 
   return (
     <>
@@ -329,21 +354,9 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
 
             {/* CTA — disabled grey by default, ink black once a size is chosen */}
             <button
+              ref={ctaRef}
               type="button"
-              onClick={() => {
-                if (!variant || ctaDisabled) return;
-                addItem({
-                  slug: product.handle,
-                  variantId: variant.id,
-                  name: product.title,
-                  image: product.images[0].url,
-                  size: size!,
-                  colour,
-                  price: Number(variant.price.amount),
-                });
-                setAdded(true);
-                setTimeout(() => setAdded(false), 2400);
-              }}
+              onClick={handleAddToCart}
               disabled={ctaDisabled}
               className={[
                 "mt-8 w-full py-5 text-[11px] uppercase tracking-[0.32em] transition-colors",
@@ -470,6 +483,38 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
           </div>
         </section>
       )}
+
+      {/* Sticky CTA — slides up when the main button scrolls out of view */}
+      <div
+        className={[
+          "fixed bottom-0 inset-x-0 z-40 transition-transform duration-300 ease-in-out",
+          ctaVisible ? "translate-y-full" : "translate-y-0",
+        ].join(" ")}
+      >
+        <div className="bg-background/95 backdrop-blur-md border-t border-border shadow-[0_-4px_24px_rgba(0,0,0,0.06)]">
+          <div className="mx-auto max-w-[1480px] px-5 md:px-10 py-3 flex items-center gap-4">
+            <div className="hidden md:block min-w-0 flex-1">
+              <p className="font-serif text-base text-ink truncate">{product.title}</p>
+              <p className="text-xs tabular-nums text-foreground/70 mt-0.5">{formatMoney(displayPrice)}</p>
+            </div>
+            <p className="md:hidden text-sm tabular-nums text-foreground/80 shrink-0">{formatMoney(displayPrice)}</p>
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              disabled={ctaDisabled}
+              className={[
+                "shrink-0 px-8 py-3.5 text-[11px] uppercase tracking-[0.28em] transition-colors",
+                "w-full md:w-auto",
+                ctaDisabled
+                  ? "bg-disabled text-offwhite cursor-not-allowed"
+                  : "bg-ink text-offwhite hover:bg-ink/90",
+              ].join(" ")}
+            >
+              {ctaLabel}
+            </button>
+          </div>
+        </div>
+      </div>
     </>
   );
 }
