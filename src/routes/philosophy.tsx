@@ -31,39 +31,38 @@ function PhilosophyPage() {
         </h1>
       </section>
 
-      <section className="mx-auto max-w-[1480px] px-6 md:px-10 pb-24">
-        <div className="grid md:grid-cols-12 gap-10 md:gap-16 items-start">
-          <p className="md:col-span-3 eyebrow md:sticky md:top-28 reveal-subtle">I — Material</p>
-          <div className="md:col-span-8 md:col-start-5 space-y-8 reveal">
-            <p className="font-serif text-2xl md:text-3xl leading-[1.4] text-foreground">
-              We begin with the fibre. Not the silhouette, not the season. The fibre.
-            </p>
-            <p className="text-foreground/80 leading-[1.85]">
-              The behaviour of a garment is largely determined before it is cut. A poorly chosen
-              fibre cannot be redeemed by tailoring; a well-chosen fibre demands very little
-              intervention. We work, accordingly, with raw materials selected on a single criterion:
-              that they perform beyond the requirements of the garment.
-            </p>
-            <p className="text-foreground/80 leading-[1.85]">
-              In wool, this means 17.9-micron Australian Merino, classed and traded by station
-              rather than commodity lot. In cotton, it means long-staple Pima, combed twice. In
-              outerwear, it means a cashmere-wool blend woven on slow looms in the Biella valley,
-              where the air is humid enough to keep the fibre supple during finishing.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <div className="aspect-[16/9] md:aspect-[21/9] overflow-hidden reveal">
+      <section className="bg-charcoal text-offwhite py-32 md:py-44 relative overflow-hidden">
         <img
           src={fabricImg}
           alt=""
           loading="lazy"
           width={1920}
           height={1080}
-          className="h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover opacity-20"
         />
-      </div>
+        <div className="relative mx-auto max-w-[1480px] px-6 md:px-10">
+          <div className="grid md:grid-cols-12 gap-10 md:gap-16 items-start">
+            <p className="md:col-span-3 eyebrow text-offwhite/60 md:sticky md:top-28 reveal-subtle">I — Material</p>
+            <div className="md:col-span-8 md:col-start-5 space-y-8 reveal">
+              <p className="font-serif text-2xl md:text-3xl leading-[1.4] text-offwhite">
+                We begin with the fibre. Not the silhouette, not the season. The fibre.
+              </p>
+              <p className="text-offwhite/80 leading-[1.85] font-light">
+                The behaviour of a garment is largely determined before it is cut. A poorly chosen
+                fibre cannot be redeemed by tailoring; a well-chosen fibre demands very little
+                intervention. We work, accordingly, with raw materials selected on a single criterion:
+                that they perform beyond the requirements of the garment.
+              </p>
+              <p className="text-offwhite/80 leading-[1.85] font-light">
+                In wool, this means 17.9-micron Australian Merino, classed and traded by station
+                rather than commodity lot. In cotton, it means long-staple Pima, combed twice. In
+                outerwear, it means a cashmere-wool blend woven on slow looms in the Biella valley,
+                where the air is humid enough to keep the fibre supple during finishing.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section className="mx-auto max-w-[1480px] px-6 md:px-10 py-24 md:py-32">
         <div className="grid md:grid-cols-12 gap-10 md:gap-16 items-start">
