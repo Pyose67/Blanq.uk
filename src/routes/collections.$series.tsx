@@ -1,119 +1,68 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { ProductCard } from "@/components/site/ProductCard";
-import { getCollectionByHandle, getAllProducts, type ShopifyProduct } from "@/lib/shopify";
-
-/**
- * Series → Shopify collection handle mapping.
- * If the collection does not exist in the connected store, we fall back to
- * filtering all products by a heuristic so the page still renders.
- */
-const seriesMeta = {
-  merino: {
-    handle: "merino",
-    title: "The Merino Series",
-    description: "Garments engineered around a single fibre.",
-    fallback: (p: ShopifyProduct) => /merino|knit|wool/i.test(`${p.title} ${p.productType}`),
-  },
-  core: {
-    handle: "core",
-    title: "The Core Collection",
-    description: "The permanent foundation of the wardrobe.",
-    fallback: (_p: ShopifyProduct) => true,
-  },
-  new: {
-    handle: "new-arrivals",
-    title: "New Arrivals",
-    description: "Recent additions to the catalogue.",
-    fallback: (_p: ShopifyProduct) => true,
-  },
-} as const;
-
-type SeriesKey = keyof typeof seriesMeta;
-
-function isSeriesKey(s: string): s is SeriesKey {
-  return s in seriesMeta;
-}
+import { getCollectionByHandle, type ShopifyProduct } from "@/lib/shopify";
 
 export const Route = createFileRoute("/collections/$series")({
-  loader: ({ params }) => {
-    if (!isSeriesKey(params.series)) {
-      return { key: "core" as SeriesKey };
-    }
-    return { key: params.series };
-  },
+  loader: ({ params }) => ({ handle: params.series }),
   head: ({ loaderData }) => {
-    const meta = loaderData ? seriesMeta[loaderData.key] : seriesMeta.core;
+    const handle = loaderData?.handle ?? "";
+    const title = handle
+      .split("-")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
     return {
       meta: [
-        { title: `${meta.title} | BLANQ` },
-        { name: "description", content: meta.description },
-        { property: "og:title", content: `${meta.title} | BLANQ` },
-        { property: "og:description", content: meta.description },
+        { title: `${title} — Blanq` },
+        { name: "description", content: `Shop ${title} at Blanq.` },
+        { property: "og:title", content: `${title} — Blanq` },
       ],
     };
   },
   component: CollectionPage,
 });
 
-function CollectionPage() {
-  const { key } = Route.useLoaderData();
-  const safeKey: SeriesKey = isSeriesKey(key) ? key : "core";
-  const meta = seriesMeta[safeKey];
+type Status = "loading" | "found" | "empty" | "notfound";
 
-  const [products, setProducts] = useState<ShopifyProduct[] | null>(null);
-  const [headline, setHeadline] = useState<{ title: string; description: string }>({
-    title: meta.title,
-    description: meta.description,
-  });
+function CollectionPage() {
+  const { handle } = Route.useLoaderData();
+
+  const [status, setStatus] = useState<Status>("loading");
+  const [products, setProducts] = useState<ShopifyProduct[]>([]);
+  const [headline, setHeadline] = useState({ title: "", description: "" });
 
   useEffect(() => {
     let cancelled = false;
-    setProducts(null);
-    setHeadline({ title: meta.title, description: meta.description });
+    setStatus("loading");
+    setProducts([]);
 
-    (async () => {
-      // 1. Try the Shopify collection by handle
-      try {
-        const collection = await getCollectionByHandle(meta.handle, 100);
+    getCollectionByHandle(handle, 100)
+      .then((collection) => {
         if (cancelled) return;
-        if (collection && collection.products.length > 0) {
-          setProducts(collection.products);
-          setHeadline({
-            title: collection.title || meta.title,
-            description: collection.description || meta.description,
-          });
+        if (!collection) {
+          setStatus("notfound");
           return;
         }
-      } catch (e) {
-        console.error("Collection fetch failed, falling back to products list:", e);
-      }
-
-      // 2. Fallback — load all products and filter heuristically
-      try {
-        const all = await getAllProducts(100);
-        if (cancelled) return;
-        setProducts(all.filter(meta.fallback));
-      } catch (e) {
-        console.error(e);
-        if (!cancelled) setProducts([]);
-      }
-    })();
+        setHeadline({ title: collection.title, description: collection.description });
+        setProducts(collection.products);
+        setStatus(collection.products.length === 0 ? "empty" : "found");
+      })
+      .catch(() => {
+        if (!cancelled) setStatus("notfound");
+      });
 
     return () => {
       cancelled = true;
     };
-  }, [meta]);
+  }, [handle]);
 
-  const items = products ?? [];
-
-  const allSizes = useMemo(() => collectOptionValues(items, "size"), [items]);
-  const allColours = useMemo(() => collectOptionValues(items, "colour"), [items]);
+  const allSizes = useMemo(() => collectOptionValues(products, "size"), [products]);
+  const allColours = useMemo(() => collectOptionValues(products, "colour"), [products]);
 
   const [size, setSize] = useState<string | null>(null);
   const [colour, setColour] = useState<string | null>(null);
 
-  const filtered = items.filter((p) => {
+  const filtered = products.filter((p) => {
     if (size) {
       const opt = p.options.find((o) => /size/i.test(o.name));
       if (!opt || !opt.values.includes(size)) return false;
@@ -125,13 +74,42 @@ function CollectionPage() {
     return true;
   });
 
+  if (status === "notfound") {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center px-4">
+        <div className="max-w-md text-center">
+          <p className="eyebrow mb-6">Not found</p>
+          <h1 className="font-serif text-4xl text-foreground">Collection unavailable</h1>
+          <p className="mt-4 text-sm text-muted-foreground">
+            This collection does not exist or has been removed from the catalogue.
+          </p>
+          <Link
+            to="/collections/"
+            className="mt-8 inline-block link-underline text-[11px] uppercase tracking-[0.22em]"
+          >
+            View all collections
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <section className="border-b border-border">
         <div className="mx-auto max-w-[1480px] px-6 md:px-10 py-20 md:py-28">
-          <p className="eyebrow mb-6 reveal-subtle">Catalogue / {headline.title}</p>
+          <p className="eyebrow mb-6 reveal-subtle">
+            <Link to="/collections/" className="hover:text-foreground transition-colors">
+              Catalogue
+            </Link>
+            {headline.title && ` / ${headline.title}`}
+          </p>
           <h1 className="font-serif text-5xl md:text-7xl leading-[1.05] tracking-tight max-w-3xl reveal">
-            {headline.title}
+            {status === "loading" ? (
+              <span className="block h-[1.05em] w-64 bg-muted animate-pulse rounded" />
+            ) : (
+              headline.title
+            )}
           </h1>
           {headline.description && (
             <p className="mt-6 text-muted-foreground max-w-xl">{headline.description}</p>
@@ -154,27 +132,34 @@ function CollectionPage() {
                   onChange={setColour}
                 />
               )}
-              <p className="text-xs text-muted-foreground pt-4 border-t border-border">
-                {filtered.length} {filtered.length === 1 ? "piece" : "pieces"}
-              </p>
+              {status === "found" && (
+                <p className="text-xs text-muted-foreground pt-4 border-t border-border">
+                  {filtered.length} {filtered.length === 1 ? "piece" : "pieces"}
+                </p>
+              )}
             </div>
           </aside>
+
           <div className="md:col-span-9 lg:col-span-10">
-            {products === null ? (
+            {status === "loading" ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div key={i} className="aspect-[4/5] bg-muted animate-pulse" />
                 ))}
               </div>
-            ) : filtered.length === 0 ? (
+            ) : status === "empty" || filtered.length === 0 ? (
               <div className="py-20 text-center text-muted-foreground">
                 <p className="font-serif text-2xl text-foreground">No products found</p>
-                <p className="mt-3 text-sm">Try clearing the filters or come back soon.</p>
+                <p className="mt-3 text-sm">
+                  {size || colour
+                    ? "Try clearing the filters."
+                    : "This collection has no products yet."}
+                </p>
                 <Link
-                  to="/"
+                  to="/collections/"
                   className="mt-6 inline-block link-underline text-[11px] uppercase tracking-[0.22em]"
                 >
-                  Return home
+                  View all collections
                 </Link>
               </div>
             ) : (

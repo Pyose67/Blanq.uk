@@ -12,15 +12,15 @@ import { useCart } from "@/lib/cart";
 
 const desktopNav = [
   { to: "/philosophy", label: "Philosophy" },
-  { to: "/collections/$series", params: { series: "merino" }, label: "Collections" },
-  { to: "/collections/$series", params: { series: "new" }, label: "Atelier" },
+  { to: "/collections/", label: "Collections" },
+  { to: "/collections/$series", params: { series: "new-arrivals" }, label: "New Arrivals" },
 ] as const;
 
 const mobileNav = [
   { to: "/", label: "Home" },
-  { to: "/collections/$series", params: { series: "merino" }, label: "Collections" },
+  { to: "/collections/", label: "Collections" },
   { to: "/philosophy", label: "Philosophy" },
-  { to: "/collections/$series", params: { series: "new" }, label: "New" },
+  { to: "/collections/$series", params: { series: "new-arrivals" }, label: "New Arrivals" },
 ] as const;
 
 export function Header() {

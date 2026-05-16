@@ -456,6 +456,7 @@ const COLLECTION_QUERY = `
       title
       description
       handle
+      image { url altText width height }
       products(first: $first) {
         edges { node { ${PRODUCT_FIELDS} } }
       }
@@ -465,20 +466,39 @@ const COLLECTION_QUERY = `
 
 const COLLECTIONS_LIST_QUERY = `
   query Collections($first: Int!) {
-    collections(first: $first) { edges { node { id title handle } } }
+    collections(first: $first) {
+      edges {
+        node {
+          id
+          title
+          handle
+          description
+          image { url altText width height }
+        }
+      }
+    }
   }
 `;
+
+export interface ShopifyCollectionImage {
+  url: string;
+  altText: string | null;
+  width: number | null;
+  height: number | null;
+}
 
 export interface ShopifyCollectionSummary {
   id: string;
   handle: string;
   title: string;
+  description: string;
+  image: ShopifyCollectionImage | null;
 }
 
 export async function getCollectionByHandle(
   handle: string,
   first = 50,
-): Promise<{ title: string; description: string; products: ShopifyProduct[] } | null> {
+): Promise<{ title: string; description: string; image: ShopifyCollectionImage | null; products: ShopifyProduct[] } | null> {
   const json = await storefrontApiRequest<{ collection: any | null }>(COLLECTION_QUERY, {
     handle,
     first,
@@ -488,11 +508,12 @@ export async function getCollectionByHandle(
   return {
     title: c.title,
     description: c.description ?? "",
+    image: c.image ?? null,
     products: (c.products?.edges ?? []).map((e: any) => normalizeProduct(e.node)),
   };
 }
 
-export async function listCollections(first = 25): Promise<ShopifyCollectionSummary[]> {
+export async function listCollections(first = 50): Promise<ShopifyCollectionSummary[]> {
   const json = await storefrontApiRequest<{ collections: { edges: { node: any }[] } }>(
     COLLECTIONS_LIST_QUERY,
     { first },
@@ -501,6 +522,8 @@ export async function listCollections(first = 25): Promise<ShopifyCollectionSumm
     id: e.node.id,
     handle: e.node.handle,
     title: e.node.title,
+    description: e.node.description ?? "",
+    image: e.node.image ?? null,
   }));
 }
 

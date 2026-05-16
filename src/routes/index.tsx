@@ -37,9 +37,8 @@ function Home() {
       });
   }, []);
 
-  const merino = (products ?? []).filter((p) => /merino|knit/i.test(`${p.title} ${p.productType}`));
-  const others = (products ?? []).filter((p) => !merino.includes(p));
   const featured = (products ?? []).slice(0, 3);
+  const recent = (products ?? []).slice(0, 4);
 
   return (
     <>
@@ -69,11 +68,10 @@ function Home() {
             </p>
             <div className="mt-10 flex items-center gap-8">
               <Link
-                to="/collections/$series"
-                params={{ series: "merino" }}
+                to="/collections/"
                 className="text-offwhite text-[11px] uppercase tracking-[0.22em] border-b border-offwhite/60 pb-1 hover:border-offwhite transition-colors"
               >
-                Discover the Merino Series
+                Explore the Collection
               </Link>
               <Link
                 to="/philosophy"
@@ -99,25 +97,9 @@ function Home() {
         </div>
       </section>
 
-      {/* MERINO SERIES */}
+      {/* MATERIAL EDITORIAL */}
       <section className="bg-secondary/40 py-28 md:py-36">
         <div className="mx-auto max-w-[1480px] px-6 md:px-10">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 reveal">
-            <div>
-              <p className="eyebrow mb-4">Series I</p>
-              <h2 className="font-serif text-4xl md:text-5xl">The Merino Series</h2>
-              <p className="mt-4 text-muted-foreground max-w-md">
-                Garments engineered around a single fibre.
-              </p>
-            </div>
-            <Link
-              to="/collections/$series"
-              params={{ series: "merino" }}
-              className="link-underline text-[11px] uppercase tracking-[0.22em]"
-            >
-              View the series
-            </Link>
-          </div>
           <div className="grid md:grid-cols-2 gap-10 md:gap-16">
             <div className="aspect-[4/5] overflow-hidden reveal">
               <img
@@ -130,32 +112,22 @@ function Home() {
               />
             </div>
             <div className="flex flex-col justify-center reveal">
-              <p className="eyebrow mb-6">17.9 µm Australian Merino</p>
+              <p className="eyebrow mb-6">On Material</p>
               <h3 className="font-serif text-3xl md:text-4xl leading-tight mb-6">
-                A single fibre, finished in Biella.
+                We begin with the fibre.
               </h3>
               <p className="text-muted-foreground leading-relaxed mb-10">
-                We work with one classification of wool, sourced from a single growing region in New
-                South Wales. The fineness of the fibre — 17.9 microns — sits at the threshold
-                between strength and softness. It is spun, knitted and finished in the same valley
-                in Northern Italy.
+                The behaviour of a garment is largely determined before it is cut. We work,
+                accordingly, with raw materials selected on a single criterion: that they
+                perform beyond the requirements of the garment. Wool from New South Wales.
+                Cotton from Peru. Finished where it is best understood.
               </p>
-              <div className="grid grid-cols-2 gap-6 max-w-md">
-                {merino.slice(0, 4).map((p) => (
-                  <Link
-                    key={p.handle}
-                    to="/product/$slug"
-                    params={{ slug: p.handle }}
-                    className="group"
-                  >
-                    <p className="text-sm">{p.title}</p>
-                    <p className="text-xs text-muted-foreground tabular-nums mt-1">
-                      {Number(p.priceRange.minVariantPrice.amount).toFixed(0)}{" "}
-                      {p.priceRange.minVariantPrice.currencyCode}
-                    </p>
-                  </Link>
-                ))}
-              </div>
+              <Link
+                to="/philosophy"
+                className="link-underline text-[11px] uppercase tracking-[0.22em] self-start"
+              >
+                Read the philosophy
+              </Link>
             </div>
           </div>
         </div>
@@ -239,8 +211,7 @@ function Home() {
             <h2 className="font-serif text-4xl md:text-5xl">New Arrivals</h2>
           </div>
           <Link
-            to="/collections/$series"
-            params={{ series: "new" }}
+            to="/collections/"
             className="link-underline text-[11px] uppercase tracking-[0.22em]"
           >
             View all
@@ -248,11 +219,11 @@ function Home() {
         </div>
         {products === null ? (
           <ProductGridSkeleton />
-        ) : others.length === 0 && featured.length === 0 ? (
+        ) : recent.length === 0 ? (
           <EmptyState />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16 stagger-grid">
-            {(others.length ? others : featured).slice(0, 4).map((p) => (
+            {recent.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>

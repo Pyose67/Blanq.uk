@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Instagram, Facebook } from "lucide-react";
-import { getShopPolicies, siteConfig, type ShopPolicies } from "@/lib/shopify";
+import { getShopPolicies, listCollections, siteConfig, type ShopPolicies, type ShopifyCollectionSummary } from "@/lib/shopify";
 import { PaymentIcons } from "@/components/site/PaymentIcons";
 
 function PinterestIcon({ className }: { className?: string }) {
@@ -14,6 +14,7 @@ function PinterestIcon({ className }: { className?: string }) {
 
 export function Footer() {
   const [policies, setPolicies] = useState<ShopPolicies | null>(null);
+  const [collections, setCollections] = useState<ShopifyCollectionSummary[] | null>(null);
   const [emailCopied, setEmailCopied] = useState(false);
 
   function handleEmailClick(e: React.MouseEvent<HTMLAnchorElement>) {
@@ -21,13 +22,15 @@ export function Footer() {
       setEmailCopied(true);
       setTimeout(() => setEmailCopied(false), 2000);
     });
-    // deixa o mailto: continuar normalmente — quem tem cliente de email abre-o
   }
 
   useEffect(() => {
     getShopPolicies()
       .then(setPolicies)
       .catch(() => setPolicies(null));
+    listCollections(20)
+      .then(setCollections)
+      .catch(() => setCollections([]));
   }, []);
 
   const policyLinks = [
@@ -58,35 +61,33 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <p className="eyebrow mb-6">Catalogue</p>
+            <p className="eyebrow mb-6">
+              <Link to="/collections/" className="hover:text-foreground transition-colors">
+                Catalogue
+              </Link>
+            </p>
             <ul className="space-y-3 text-sm">
-              <li>
-                <Link
-                  to="/collections/$series"
-                  params={{ series: "merino" }}
-                  className="link-underline"
-                >
-                  The Merino Series
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/collections/$series"
-                  params={{ series: "core" }}
-                  className="link-underline"
-                >
-                  The Core Collection
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/collections/$series"
-                  params={{ series: "new" }}
-                  className="link-underline"
-                >
-                  New Arrivals
-                </Link>
-              </li>
+              {collections === null && (
+                <li className="text-muted-foreground text-xs">Loading…</li>
+              )}
+              {collections?.map((c) => (
+                <li key={c.id}>
+                  <Link
+                    to="/collections/$series"
+                    params={{ series: c.handle }}
+                    className="link-underline"
+                  >
+                    {c.title}
+                  </Link>
+                </li>
+              ))}
+              {collections?.length === 0 && (
+                <li>
+                  <Link to="/collections/" className="link-underline">
+                    View all
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
           <div>
