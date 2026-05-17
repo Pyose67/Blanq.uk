@@ -434,35 +434,6 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
         </div>
       </section>
 
-      {/* PHILOSOPHY — The Blanq Standard */}
-      <section className="bg-sand/40 py-24 md:py-32 mt-16">
-        <div className="mx-auto max-w-[1480px] px-5 md:px-10">
-          <div className="grid md:grid-cols-12 gap-10 mb-12">
-            <p className="md:col-span-3 eyebrow reveal-subtle">The BLANQ Standard</p>
-            <h2 className="md:col-span-8 md:col-start-5 font-serif text-3xl md:text-5xl leading-[1.15] text-ink reveal">
-              An obsession with the material itself.
-            </h2>
-          </div>
-          <div className="grid md:grid-cols-2 gap-12 md:gap-20 max-w-5xl md:ml-[calc(25%_-_2.5rem)]">
-            <div className="reveal">
-              <p className="text-foreground/85 leading-[1.8] text-[15px]">
-                We do not use synthetic blends. The garments are drawn from a small set of natural
-                fibres — Australian Merino at 17.9 microns, long-staple Pima cotton, Italian
-                cashmere — selected on a single criterion: that the raw material itself can carry
-                the design.
-              </p>
-            </div>
-            <div className="reveal">
-              <p className="text-foreground/85 leading-[1.8] text-[15px]">
-                Each material is traced from origin: a wool station in New South Wales, a spinning
-                mill in Biella, a tailoring house in Naples. We work directly with the people who
-                make. Global to global. No intermediaries.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* CLIENT REVIEWS */}
       <ReviewsSection productId={product.id} />
 

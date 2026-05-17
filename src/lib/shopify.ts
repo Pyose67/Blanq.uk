@@ -164,7 +164,7 @@ const PRODUCT_FIELDS = `
   vendor
   productType
   priceRange { minVariantPrice { amount currencyCode } }
-  images(first: 10) { edges { node { url altText width height } } }
+  images(first: 30) { edges { node { url altText width height } } }
   options { id name values }
   variants(first: 100) {
     edges {
