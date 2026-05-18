@@ -161,12 +161,49 @@ async function _judgemeProxy(request, env) {
   }
 }
 
+async function _shopifyGraphqlProxy(request) {
+  try {
+    const body = await request.text();
+    const upstreamHeaders = {
+      "Content-Type": "application/json",
+      "X-Shopify-Storefront-Access-Token": "b75a0575696cb015c78e584d83e453d4",
+    };
+    const visitToken = request.headers.get("X-Shopify-VisitToken");
+    const uniqueToken = request.headers.get("X-Shopify-UniqueToken");
+    if (visitToken) upstreamHeaders["X-Shopify-VisitToken"] = visitToken;
+    if (uniqueToken) upstreamHeaders["X-Shopify-UniqueToken"] = uniqueToken;
+
+    const upstream = await _nativeFetch(
+      "https://mn510i-qb.myshopify.com/api/unstable/graphql.json",
+      { method: "POST", headers: upstreamHeaders, body }
+    );
+
+    const data = await upstream.text();
+    const resHeaders = new Headers({
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store",
+    });
+    const serverTiming = upstream.headers.get("Server-Timing");
+    if (serverTiming) resHeaders.set("Server-Timing", serverTiming);
+    return new Response(data, { status: upstream.status, headers: resHeaders });
+  } catch {
+    return new Response(JSON.stringify({ errors: [{ message: "proxy error" }] }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+}
+
 const _assetAwareFetch = async (request, env, ctx) => {
   try {
     const { pathname: p } = _parsePathAndQuery(request.url);
 
     if (p === "/api/reviews") {
       return await _judgemeProxy(request, env);
+    }
+
+    if (p === "/api/unstable/graphql.json") {
+      return await _shopifyGraphqlProxy(request);
     }
 
     const isStatic =
@@ -204,4 +241,4 @@ if (fs.existsSync(".wrangler")) {
   fs.rmSync(".wrangler", { recursive: true, force: true });
 }
 
-console.log("✓ _worker.js criado com /api/reviews + asset passthrough + SSR");
+console.log("✓ _worker.js criado com /api/reviews + /api/unstable/graphql.json proxy + asset passthrough + SSR");
