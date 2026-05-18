@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"; // v2
+import { useEffect, useRef } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import {
   sendShopifyAnalytics,
@@ -16,7 +16,6 @@ import {
 const CURRENCY = "GBP" as const;
 const LANGUAGE = "EN" as const;
 
-// Poll document.cookie until _shopify_y is present (set by useShopifyCookies async fetch)
 function waitForCookies(maxMs = 5000): Promise<boolean> {
   return new Promise((resolve) => {
     const start = Date.now();
@@ -27,6 +26,14 @@ function waitForCookies(maxMs = 5000): Promise<boolean> {
     }
     check();
   });
+}
+
+function pathnameToPageType(path: string): string {
+  if (path === "/") return AnalyticsPageType.home;
+  if (path.startsWith("/product/")) return AnalyticsPageType.product;
+  if (path.startsWith("/collections/")) return AnalyticsPageType.collection;
+  if (path.startsWith("/policies/")) return AnalyticsPageType.policy;
+  return AnalyticsPageType.page;
 }
 
 async function firePageView(shopId: string, pageType: string, extra?: object) {
@@ -58,24 +65,33 @@ export function ShopifyAnalytics() {
 
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const shopIdRef = useRef<string | null>(null);
-  const sentRef = useRef<string | null>(null);
+  const sentPaths = useRef<Set<string>>(new Set());
+  // Queue paths visited before cookies were ready
+  const pendingPaths = useRef<Set<string>>(new Set());
 
-  // Re-runs when pathname changes OR when cookies become ready
+  // While cookies aren't ready, collect visited paths
+  useEffect(() => {
+    if (!cookiesReady) {
+      pendingPaths.current.add(pathname);
+    }
+  }, [pathname, cookiesReady]);
+
+  // Once cookies are ready, fire all pending paths + current path
   useEffect(() => {
     if (!cookiesReady) return;
-    if (sentRef.current === pathname) return;
-    sentRef.current = pathname;
 
-    let pageType: string = AnalyticsPageType.page;
-    if (pathname === "/") pageType = AnalyticsPageType.home;
-    else if (pathname.startsWith("/product/")) pageType = AnalyticsPageType.product;
-    else if (pathname.startsWith("/collections/")) pageType = AnalyticsPageType.collection;
-    else if (pathname.startsWith("/policies/")) pageType = AnalyticsPageType.policy;
+    const toFire = new Set([...pendingPaths.current, pathname]);
+    pendingPaths.current.clear();
 
     (async () => {
       if (!shopIdRef.current) shopIdRef.current = await getShopId();
       if (!shopIdRef.current) return;
-      await firePageView(shopIdRef.current, pageType);
+
+      for (const path of toFire) {
+        if (sentPaths.current.has(path)) continue;
+        sentPaths.current.add(path);
+        await firePageView(shopIdRef.current, pathnameToPageType(path));
+      }
     })();
   }, [pathname, cookiesReady]);
 
