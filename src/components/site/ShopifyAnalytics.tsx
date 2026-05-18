@@ -16,6 +16,19 @@ import {
 const CURRENCY = "GBP" as const;
 const LANGUAGE = "EN" as const;
 
+// Poll document.cookie until _shopify_y is present (set by useShopifyCookies async fetch)
+function waitForCookies(maxMs = 5000): Promise<boolean> {
+  return new Promise((resolve) => {
+    const start = Date.now();
+    function check() {
+      if (document.cookie.includes("_shopify_y=")) return resolve(true);
+      if (Date.now() - start > maxMs) return resolve(false);
+      setTimeout(check, 100);
+    }
+    check();
+  });
+}
+
 async function firePageView(shopId: string, pageType: string, extra?: object) {
   await sendShopifyAnalytics(
     {
@@ -36,7 +49,7 @@ async function firePageView(shopId: string, pageType: string, extra?: object) {
 }
 
 export function ShopifyAnalytics() {
-  useShopifyCookies({
+  const cookiesReady = useShopifyCookies({
     hasUserConsent: true,
     storefrontAccessToken: SHOPIFY_STOREFRONT_TOKEN,
     fetchTrackingValues: true,
@@ -47,7 +60,9 @@ export function ShopifyAnalytics() {
   const shopIdRef = useRef<string | null>(null);
   const sentRef = useRef<string | null>(null);
 
+  // Re-runs when pathname changes OR when cookies become ready
   useEffect(() => {
+    if (!cookiesReady) return;
     if (sentRef.current === pathname) return;
     sentRef.current = pathname;
 
@@ -62,16 +77,22 @@ export function ShopifyAnalytics() {
       if (!shopIdRef.current) return;
       await firePageView(shopIdRef.current, pageType);
     })();
-  }, [pathname]);
+  }, [pathname, cookiesReady]);
 
   return null;
 }
 
-export function useProductViewAnalytics(productId: string, productTitle: string, price: string, productType: string) {
+export function useProductViewAnalytics(
+  productId: string,
+  productTitle: string,
+  price: string,
+  productType: string,
+) {
   const shopIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     (async () => {
+      if (!(await waitForCookies())) return;
       if (!shopIdRef.current) shopIdRef.current = await getShopId();
       if (!shopIdRef.current) return;
       await firePageView(shopIdRef.current, AnalyticsPageType.product, {
@@ -97,6 +118,7 @@ export function useCollectionViewAnalytics(handle: string, collectionId: string 
   useEffect(() => {
     if (!collectionId) return;
     (async () => {
+      if (!(await waitForCookies())) return;
       if (!shopIdRef.current) shopIdRef.current = await getShopId();
       if (!shopIdRef.current) return;
       await firePageView(shopIdRef.current, AnalyticsPageType.collection, {
