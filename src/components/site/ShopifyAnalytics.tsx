@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react"; // v2
 import { useRouterState } from "@tanstack/react-router";
 import {
   sendShopifyAnalytics,
