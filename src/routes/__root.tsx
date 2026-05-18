@@ -4,6 +4,7 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { CartProvider, useCartSync } from "@/lib/cart";
 import { CartDrawer } from "@/components/site/CartDrawer";
+import { ShopifyAnalytics } from "@/components/site/ShopifyAnalytics";
 
 import appCss from "../styles.css?url";
 
@@ -151,6 +152,7 @@ function RootComponent() {
   useScrollReveal();
   return (
     <CartProvider>
+      <ShopifyAnalytics />
       <div className="min-h-screen flex flex-col">
         <Header />
         <main className="flex-1">

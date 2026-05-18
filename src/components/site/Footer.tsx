@@ -62,7 +62,7 @@ export function Footer() {
           </div>
           <div>
             <p className="eyebrow mb-6">
-              <Link to="/collections/" className="hover:text-foreground transition-colors">
+              <Link to="/collections" className="hover:text-foreground transition-colors">
                 Catalogue
               </Link>
             </p>
@@ -83,7 +83,7 @@ export function Footer() {
               ))}
               {collections?.length === 0 && (
                 <li>
-                  <Link to="/collections/" className="link-underline">
+                  <Link to="/collections" className="link-underline">
                     View all
                   </Link>
                 </li>

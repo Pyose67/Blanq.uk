@@ -27,6 +27,7 @@ import {
 } from "@/lib/shopify";
 import { ProductCard } from "@/components/site/ProductCard";
 import { useCart } from "@/lib/cart";
+import { useProductViewAnalytics } from "@/components/site/ShopifyAnalytics";
 
 export const Route = createFileRoute("/product/$slug")({
   loader: async ({ params }) => {
@@ -78,6 +79,12 @@ function ProductPage() {
 
 function ProductView({ product, related }: { product: ShopifyProduct; related: ShopifyProduct[] }) {
   const { addItem } = useCart();
+  useProductViewAnalytics(
+    product.id,
+    product.title,
+    product.priceRange.minVariantPrice.amount,
+    product.productType,
+  );
 
   const colourOption = product.options.find((o) => /colou?r/i.test(o.name));
   const sizeOption = product.options.find((o) => /size/i.test(o.name));

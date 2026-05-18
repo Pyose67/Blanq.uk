@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { ProductCard } from "@/components/site/ProductCard";
 import { getCollectionByHandle, type ShopifyProduct } from "@/lib/shopify";
+import { useCollectionViewAnalytics } from "@/components/site/ShopifyAnalytics";
 
 export const Route = createFileRoute("/collections/$series")({
   loader: ({ params }) => ({ handle: params.series }),
@@ -30,11 +31,15 @@ function CollectionPage() {
   const [status, setStatus] = useState<Status>("loading");
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [headline, setHeadline] = useState({ title: "", description: "" });
+  const [collectionId, setCollectionId] = useState<string | undefined>();
+
+  useCollectionViewAnalytics(handle, collectionId);
 
   useEffect(() => {
     let cancelled = false;
     setStatus("loading");
     setProducts([]);
+    setCollectionId(undefined);
 
     getCollectionByHandle(handle, 100)
       .then((collection) => {
@@ -43,6 +48,7 @@ function CollectionPage() {
           setStatus("notfound");
           return;
         }
+        setCollectionId(collection.id);
         setHeadline({ title: collection.title, description: collection.description });
         setProducts(collection.products);
         setStatus(collection.products.length === 0 ? "empty" : "found");
@@ -84,7 +90,7 @@ function CollectionPage() {
             This collection does not exist or has been removed from the catalogue.
           </p>
           <Link
-            to="/collections/"
+            to="/collections"
             className="mt-8 inline-block link-underline text-[11px] uppercase tracking-[0.22em]"
           >
             View all collections
@@ -99,7 +105,7 @@ function CollectionPage() {
       <section className="border-b border-border">
         <div className="mx-auto max-w-[1480px] px-6 md:px-10 py-20 md:py-28">
           <p className="eyebrow mb-6 reveal-subtle">
-            <Link to="/collections/" className="hover:text-foreground transition-colors">
+            <Link to="/collections" className="hover:text-foreground transition-colors">
               Catalogue
             </Link>
             {headline.title && ` / ${headline.title}`}
@@ -156,7 +162,7 @@ function CollectionPage() {
                     : "This collection has no products yet."}
                 </p>
                 <Link
-                  to="/collections/"
+                  to="/collections"
                   className="mt-6 inline-block link-underline text-[11px] uppercase tracking-[0.22em]"
                 >
                   View all collections

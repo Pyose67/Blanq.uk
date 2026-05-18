@@ -498,7 +498,7 @@ export interface ShopifyCollectionSummary {
 export async function getCollectionByHandle(
   handle: string,
   first = 50,
-): Promise<{ title: string; description: string; image: ShopifyCollectionImage | null; products: ShopifyProduct[] } | null> {
+): Promise<{ id: string; title: string; description: string; image: ShopifyCollectionImage | null; products: ShopifyProduct[] } | null> {
   const json = await storefrontApiRequest<{ collection: any | null }>(COLLECTION_QUERY, {
     handle,
     first,
@@ -506,6 +506,7 @@ export async function getCollectionByHandle(
   const c = json?.data?.collection;
   if (!c) return null;
   return {
+    id: c.id,
     title: c.title,
     description: c.description ?? "",
     image: c.image ?? null,
@@ -569,6 +570,19 @@ export function findOption(
 ): ShopifyProductOption | undefined {
   const n = name.toLowerCase();
   return product.options.find((o) => o.name.toLowerCase() === n);
+}
+
+// =====================================================================
+// Shop ID — cached, used by Shopify Analytics
+// =====================================================================
+
+let _shopId: string | null = null;
+
+export async function getShopId(): Promise<string | null> {
+  if (_shopId) return _shopId;
+  const json = await storefrontApiRequest<{ shop: { id: string } }>(`query { shop { id } }`);
+  _shopId = json?.data?.shop?.id ?? null;
+  return _shopId;
 }
 
 // =====================================================================

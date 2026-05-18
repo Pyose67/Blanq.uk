@@ -173,7 +173,7 @@ function PhilosophyPage() {
         </h2>
         <div className="mt-12 flex flex-wrap justify-center gap-10">
           <Link
-            to="/collections/"
+            to="/collections"
             className="text-[11px] uppercase tracking-[0.22em] border-b border-foreground pb-1"
           >
             Explore the Collection

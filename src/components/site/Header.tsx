@@ -12,13 +12,13 @@ import { useCart } from "@/lib/cart";
 
 const desktopNav = [
   { to: "/philosophy", label: "Philosophy" },
-  { to: "/collections/", label: "Collections" },
+  { to: "/collections", label: "Collections" },
   { to: "/collections/$series", params: { series: "new-arrivals" }, label: "New Arrivals" },
 ] as const;
 
 const mobileNav = [
   { to: "/", label: "Home" },
-  { to: "/collections/", label: "Collections" },
+  { to: "/collections", label: "Collections" },
   { to: "/philosophy", label: "Philosophy" },
   { to: "/collections/$series", params: { series: "new-arrivals" }, label: "New Arrivals" },
 ] as const;

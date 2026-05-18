@@ -68,7 +68,7 @@ function Home() {
             </p>
             <div className="mt-10 flex items-center gap-8">
               <Link
-                to="/collections/"
+                to="/collections"
                 className="text-offwhite text-[11px] uppercase tracking-[0.22em] border-b border-offwhite/60 pb-1 hover:border-offwhite transition-colors"
               >
                 Explore the Collection
@@ -211,7 +211,7 @@ function Home() {
             <h2 className="font-serif text-4xl md:text-5xl">New Arrivals</h2>
           </div>
           <Link
-            to="/collections/"
+            to="/collections"
             className="link-underline text-[11px] uppercase tracking-[0.22em]"
           >
             View all
