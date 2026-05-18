@@ -27,7 +27,9 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
       <div className="relative overflow-hidden bg-muted aspect-[4/5]">
         {image && (
           <img
-            src={image.url}
+            src={`${image.url}?width=600`}
+            srcSet={`${image.url}?width=400 400w, ${image.url}?width=600 600w, ${image.url}?width=900 900w`}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             alt={image.altText ?? product.title}
             loading="lazy"
             width={image.width}

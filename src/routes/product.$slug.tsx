@@ -494,6 +494,7 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
               {sizeOption && (
                 <div className="relative">
                   <select
+                    aria-label="Select size"
                     value={size ?? ""}
                     onChange={(e) => setSize(e.target.value || null)}
                     className="appearance-none bg-transparent border border-border py-2.5 pl-3 pr-8 text-[11px] uppercase tracking-[0.18em] focus:outline-none focus:border-foreground cursor-pointer"
@@ -528,6 +529,7 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
               {sizeOption && (
                 <div className="relative flex-1 min-w-0">
                   <select
+                    aria-label="Select size"
                     value={size ?? ""}
                     onChange={(e) => setSize(e.target.value || null)}
                     className="w-full appearance-none bg-transparent border border-border py-3 pl-3 pr-7 text-[11px] uppercase tracking-[0.14em] focus:outline-none focus:border-foreground cursor-pointer"
@@ -725,7 +727,7 @@ function ReviewsSection({ productId }: { productId: string }) {
           {hasReviews ? (
             <>
               <h2 className="font-serif text-3xl md:text-4xl leading-tight text-ink">
-                {data.average.toFixed(1)} <span className="text-foreground/40">/ 5</span>
+                {data.average.toFixed(1)} <span className="text-foreground/55">/ 5</span>
               </h2>
               <div className="flex items-center gap-2 mt-3">
                 <Stars rating={data.average} />
@@ -918,7 +920,7 @@ function ReviewsSection({ productId }: { productId: string }) {
 function Stars({ rating }: { rating: number }) {
   const full = Math.round(rating);
   return (
-    <span className="inline-flex items-center gap-0.5" aria-label={`${rating} out of 5`}>
+    <span role="img" className="inline-flex items-center gap-0.5" aria-label={`${rating} out of 5`}>
       {Array.from({ length: 5 }).map((_, i) => (
         <Star
           key={i}
