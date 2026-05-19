@@ -1,5 +1,14 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+
+declare global {
+  interface Window {
+    gtag: (...args: unknown[]) => void;
+    dataLayer: unknown[];
+  }
+}
+
+const GA_ID = "G-WHW6SWYXHB";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { CartProvider, useCartSync } from "@/lib/cart";
@@ -82,6 +91,8 @@ function RootShell({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-GB">
       <head>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
+        <script dangerouslySetInnerHTML={{ __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${GA_ID}',{send_page_view:false});` }} />
         <HeadContent />
       </head>
       <body>
@@ -90,6 +101,20 @@ function RootShell({ children }: { children: React.ReactNode }) {
       </body>
     </html>
   );
+}
+
+function useGA4PageView() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const prev = useRef<string | null>(null);
+  useEffect(() => {
+    if (prev.current === pathname) return;
+    prev.current = pathname;
+    window.gtag?.("event", "page_view", {
+      page_path: pathname,
+      page_location: window.location.href,
+      page_title: document.title,
+    });
+  }, [pathname]);
 }
 
 function useScrollReveal() {
@@ -153,6 +178,7 @@ function useScrollReveal() {
 function RootComponent() {
   useCartSync();
   useScrollReveal();
+  useGA4PageView();
   return (
     <CartProvider>
       <ShopifyAnalytics />
