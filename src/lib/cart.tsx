@@ -216,6 +216,17 @@ export const useCartStore = create<CartState>()(
               ],
             });
           }
+          window.gtag?.("event", "add_to_cart", {
+            currency: "GBP",
+            value: input.price * qty,
+            items: [{
+              item_id: input.variantId,
+              item_name: input.name,
+              item_variant: `${input.colour} / ${input.size}`,
+              price: input.price,
+              quantity: qty,
+            }],
+          });
         } catch (e) {
           console.error("addItem error", e);
         } finally {

@@ -17,9 +17,18 @@ function CheckoutPage() {
 
   useEffect(() => {
     if (count === 0 || !checkoutUrl) return;
-    if (typeof window !== "undefined") {
-      window.open(checkoutUrl, "_blank");
-    }
+    window.gtag?.("event", "begin_checkout", {
+      currency: "GBP",
+      value: subtotal,
+      items: items.map((i) => ({
+        item_id: i.variantId,
+        item_name: i.name,
+        item_variant: `${i.colour} / ${i.size}`,
+        price: i.price,
+        quantity: i.quantity,
+      })),
+    });
+    window.open(checkoutUrl, "_blank");
   }, [count, checkoutUrl]);
 
   if (count === 0) {
