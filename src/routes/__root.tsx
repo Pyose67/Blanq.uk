@@ -1,14 +1,18 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
+import { trackMeta } from "@/lib/meta";
 
 declare global {
   interface Window {
     gtag: (...args: unknown[]) => void;
     dataLayer: unknown[];
+    fbq: (...args: unknown[]) => void;
+    _fbq: unknown;
   }
 }
 
 const GA_ID = "G-WHW6SWYXHB";
+const META_PIXEL_ID = "1694667638203489";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { CartProvider, useCartSync } from "@/lib/cart";
@@ -93,9 +97,11 @@ function RootShell({ children }: { children: React.ReactNode }) {
       <head>
         <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
         <script dangerouslySetInnerHTML={{ __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${GA_ID}',{send_page_view:false});` }} />
+        <script dangerouslySetInnerHTML={{ __html: `!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${META_PIXEL_ID}');` }} />
         <HeadContent />
       </head>
       <body>
+        <noscript dangerouslySetInnerHTML={{ __html: `<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1"/>` }} />
         {children}
         <Scripts />
       </body>
@@ -103,7 +109,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-function useGA4PageView() {
+function usePageTracking() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const prev = useRef<string | null>(null);
   useEffect(() => {
@@ -114,6 +120,7 @@ function useGA4PageView() {
       page_location: window.location.href,
       page_title: document.title,
     });
+    trackMeta("PageView");
   }, [pathname]);
 }
 
@@ -178,7 +185,7 @@ function useScrollReveal() {
 function RootComponent() {
   useCartSync();
   useScrollReveal();
-  useGA4PageView();
+  usePageTracking();
   return (
     <CartProvider>
       <ShopifyAnalytics />

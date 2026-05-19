@@ -194,6 +194,33 @@ async function _shopifyGraphqlProxy(request) {
   }
 }
 
+async function _metaCapiProxy(request, env) {
+  try {
+    const token = env.META_CAPI_TOKEN;
+    if (!token) return new Response(JSON.stringify({ error: "META_CAPI_TOKEN not set" }), { status: 500, headers: { "Content-Type": "application/json" } });
+
+    const body = await request.json();
+    const ip = request.headers.get("CF-Connecting-IP") || request.headers.get("X-Forwarded-For") || "";
+    const ua = request.headers.get("User-Agent") || "";
+
+    const events = (body.events || []).map(ev => ({
+      ...ev,
+      user_data: { ...ev.user_data, client_ip_address: ip, client_user_agent: ua },
+    }));
+
+    const upstream = await _nativeFetch("https://graph.facebook.com/v18.0/1694667638203489/events", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ data: events, access_token: token }),
+    });
+
+    const data = await upstream.text();
+    return new Response(data, { status: upstream.status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
+  } catch {
+    return new Response(JSON.stringify({ error: "capi proxy error" }), { status: 500, headers: { "Content-Type": "application/json" } });
+  }
+}
+
 const _assetAwareFetch = async (request, env, ctx) => {
   try {
     const { pathname: p } = _parsePathAndQuery(request.url);
@@ -204,6 +231,10 @@ const _assetAwareFetch = async (request, env, ctx) => {
 
     if (p === "/api/unstable/graphql.json") {
       return await _shopifyGraphqlProxy(request);
+    }
+
+    if (p === "/api/meta-capi") {
+      return await _metaCapiProxy(request, env);
     }
 
     const isStatic =

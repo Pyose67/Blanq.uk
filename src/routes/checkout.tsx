@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useCart, formatGBP } from "@/lib/cart";
+import { trackMeta } from "@/lib/meta";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -27,6 +28,13 @@ function CheckoutPage() {
         price: i.price,
         quantity: i.quantity,
       })),
+    });
+    // Meta Pixel + CAPI
+    trackMeta("InitiateCheckout", {
+      content_ids: items.map((i) => i.variantId),
+      num_items: items.reduce((s, i) => s + i.quantity, 0),
+      value: subtotal,
+      currency: "GBP",
     });
     window.open(checkoutUrl, "_blank");
   }, [count, checkoutUrl]);

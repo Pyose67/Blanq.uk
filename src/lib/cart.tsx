@@ -2,6 +2,7 @@ import * as React from "react";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { storefrontApiRequest } from "@/lib/shopify";
+import { trackMeta } from "@/lib/meta";
 
 // =====================================================================
 // Types
@@ -216,6 +217,7 @@ export const useCartStore = create<CartState>()(
               ],
             });
           }
+          // GA4
           window.gtag?.("event", "add_to_cart", {
             currency: "GBP",
             value: input.price * qty,
@@ -226,6 +228,14 @@ export const useCartStore = create<CartState>()(
               price: input.price,
               quantity: qty,
             }],
+          });
+          // Meta Pixel + CAPI
+          trackMeta("AddToCart", {
+            content_ids: [input.variantId],
+            content_name: input.name,
+            content_type: "product",
+            value: input.price * qty,
+            currency: "GBP",
           });
         } catch (e) {
           console.error("addItem error", e);
