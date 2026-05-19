@@ -95,6 +95,18 @@ export function ShopifyAnalytics() {
     })();
   }, [pathname, cookiesReady]);
 
+  // Heartbeat: resend page_view every 30s so Live View keeps the visitor active
+  useEffect(() => {
+    if (!cookiesReady) return;
+    const pageType = pathnameToPageType(pathname);
+    const id = setInterval(async () => {
+      if (!shopIdRef.current) shopIdRef.current = await getShopId();
+      if (!shopIdRef.current) return;
+      await firePageView(shopIdRef.current, pageType);
+    }, 30_000);
+    return () => clearInterval(id);
+  }, [pathname, cookiesReady]);
+
   return null;
 }
 
