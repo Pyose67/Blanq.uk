@@ -175,7 +175,7 @@ export function Footer() {
           <div className="md:text-right">
             <p className="font-serif italic text-sm text-foreground/70">{siteConfig.slogan}</p>
             <p className="mt-2 text-xs text-muted-foreground tracking-wide">
-              © {new Date().getFullYear()} {siteConfig.brand}. Registered in England &amp; Wales.
+              © {new Date().getFullYear()} {siteConfig.brand}.
             </p>
           </div>
         </div>
