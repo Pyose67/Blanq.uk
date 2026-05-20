@@ -314,6 +314,9 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
                     />
                   ))}
                 </div>
+                <p className="mt-3 text-[11px] text-muted-foreground/70 leading-relaxed">
+                  Colours may vary slightly from photographs.
+                </p>
               </div>
             )}
 
@@ -491,6 +494,26 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
                 <p className="font-serif text-base text-ink truncate">{product.title}</p>
                 <p className="text-xs tabular-nums text-foreground/70 mt-0.5">{formatMoney(displayPrice)}</p>
               </div>
+              {colourOption && (
+                <div className="flex items-center gap-2">
+                  {colourOption.values.map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setColour(c)}
+                      aria-label={c}
+                      title={c}
+                      aria-pressed={colour === c}
+                      className={`h-6 w-6 border-2 transition-all ${
+                        colour === c
+                          ? "border-ink ring-1 ring-offset-1 ring-offset-background ring-ink/40"
+                          : "border-disabled/40 hover:border-foreground"
+                      }`}
+                      style={{ backgroundColor: swatch(c) }}
+                    />
+                  ))}
+                </div>
+              )}
               {sizeOption && (
                 <div className="relative">
                   <select
@@ -526,6 +549,26 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
             </div>
             {/* Mobile */}
             <div className="flex md:hidden items-center gap-2">
+              {colourOption && (
+                <div className="flex items-center gap-1.5">
+                  {colourOption.values.map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setColour(c)}
+                      aria-label={c}
+                      title={c}
+                      aria-pressed={colour === c}
+                      className={`h-5 w-5 border-2 transition-all ${
+                        colour === c
+                          ? "border-ink ring-1 ring-offset-1 ring-offset-background ring-ink/40"
+                          : "border-disabled/40 hover:border-foreground"
+                      }`}
+                      style={{ backgroundColor: swatch(c) }}
+                    />
+                  ))}
+                </div>
+              )}
               {sizeOption && (
                 <div className="relative flex-1 min-w-0">
                   <select
