@@ -1,6 +1,7 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 import { trackMeta } from "@/lib/meta";
+import Clarity from "@microsoft/clarity";
 
 declare global {
   interface Window {
@@ -186,6 +187,10 @@ function RootComponent() {
   useCartSync();
   useScrollReveal();
   usePageTracking();
+  useEffect(() => {
+    Clarity.init("vwbjae5t96");
+    Clarity.consentV2(); // granted by default — update when cookie banner is added
+  }, []);
   return (
     <CartProvider>
       <ShopifyAnalytics />
