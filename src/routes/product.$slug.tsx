@@ -281,6 +281,11 @@ function ProductView({ product, related }: { product: ShopifyProduct; related: S
                 </a>
               )}
             </div>
+            <p className="mt-2 text-[11px] text-muted-foreground/70 leading-relaxed">
+              {Number(displayPrice.amount) <= 135
+                ? "All taxes and duties included."
+                : "Price includes VAT. Import duties may apply for orders outside the UK."}
+            </p>
 
             <div className="hairline my-8" />
 

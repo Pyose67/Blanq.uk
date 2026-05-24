@@ -8,7 +8,9 @@ type MetaCustomData = Record<string, unknown>;
 export function trackMeta(eventName: string, customData: MetaCustomData = {}) {
   if (typeof window === "undefined") return;
 
-  const eventId = crypto.randomUUID();
+  const eventId = typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+    ? crypto.randomUUID()
+    : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
   const fbp = getCookie("_fbp");
   const fbc = getCookie("_fbc");
 

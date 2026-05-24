@@ -7,7 +7,7 @@ export const Route = createFileRoute("/checkout")({
   head: () => ({
     meta: [
       { title: "Checkout | BLANQ" },
-      { name: "description", content: "Redirecting to secure Shopify-hosted checkout." },
+      { name: "description", content: "Redirecting to secure checkout." },
     ],
   }),
   component: CheckoutPage,
@@ -55,9 +55,9 @@ function CheckoutPage() {
   return (
     <div className="mx-auto max-w-[820px] px-6 md:px-10 py-20 md:py-28">
       <p className="eyebrow mb-4">Secure checkout</p>
-      <h1 className="font-serif text-3xl md:text-4xl text-ink mb-3">Opening Shopify checkout…</h1>
+      <h1 className="font-serif text-3xl md:text-4xl text-ink mb-3">Opening secure checkout…</h1>
       <p className="text-muted-foreground leading-relaxed">
-        Your secure Shopify checkout has opened in a new tab. If it did not, use the button below.
+        Your secure checkout has opened in a new tab. If it did not, use the button below.
       </p>
 
       <div className="hairline my-10" />
@@ -91,7 +91,7 @@ function CheckoutPage() {
           rel="noreferrer"
           className="mt-10 inline-block bg-ink text-offwhite px-10 py-5 text-[11px] uppercase tracking-[0.28em] hover:bg-ink/90 transition-colors"
         >
-          Open Shopify checkout
+          Open checkout
         </a>
       )}
 
