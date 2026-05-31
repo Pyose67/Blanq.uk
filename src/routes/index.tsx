@@ -116,7 +116,7 @@ function Home() {
               />
             </div>
             <div className="flex flex-col justify-center reveal">
-              <p className="eyebrow mb-6">The Atelier</p>
+              <Link to="/atelier" className="eyebrow mb-6 block hover:text-foreground transition-colors">The Atelier</Link>
               <h3 className="font-serif text-3xl md:text-4xl leading-tight mb-6">
                 Made where it is best understood.
               </h3>

@@ -56,7 +56,9 @@ export function Footer() {
                 <span className="text-muted-foreground">Provenance</span>
               </li>
               <li>
-                <span className="text-muted-foreground">Atelier</span>
+                <Link to="/atelier" className="link-underline">
+                  Atelier
+                </Link>
               </li>
             </ul>
           </div>
