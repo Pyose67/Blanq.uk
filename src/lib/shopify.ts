@@ -192,6 +192,14 @@ const PRODUCTS_QUERY = `
   }
 `;
 
+const BEST_SELLERS_QUERY = `
+  query GetBestSellers($first: Int!) {
+    products(first: $first, sortKey: BEST_SELLING) {
+      edges { node { ${PRODUCT_FIELDS} } }
+    }
+  }
+`;
+
 const PRODUCT_BY_HANDLE_QUERY = `
   query ProductByHandle($handle: String!) {
     product(handle: $handle) { ${PRODUCT_FIELDS} }
@@ -322,6 +330,15 @@ function richTextNodeToHtml(node: any): string {
 // =====================================================================
 // Public API
 // =====================================================================
+
+export async function getBestSellers(first = 3): Promise<ShopifyProduct[]> {
+  const json = await storefrontApiRequest<{ products: { edges: { node: any }[] } }>(
+    BEST_SELLERS_QUERY,
+    { first },
+  );
+  const edges = json?.data?.products?.edges ?? [];
+  return edges.map((e) => normalizeProduct(e.node));
+}
 
 export async function getAllProducts(first = 50, query?: string): Promise<ShopifyProduct[]> {
   const json = await storefrontApiRequest<{ products: { edges: { node: any }[] } }>(

@@ -147,7 +147,7 @@ function PhilosophyPage() {
           <div className="grid md:grid-cols-12 gap-10 md:gap-16 items-start">
             <p className="md:col-span-3 eyebrow text-offwhite/60 md:sticky md:top-28 reveal-subtle">IV — Expression</p>
             <div className="md:col-span-8 md:col-start-5 space-y-8 reveal">
-              <p className="font-serif text-3xl md:text-5xl leading-[1.2]">
+              <p className="font-serif text-2xl md:text-3xl leading-[1.4]">
                 The fibre sets the limit of what is possible. The body writes the sentence.
               </p>
               <p className="text-offwhite/80 leading-[1.85] font-light">
@@ -177,12 +177,6 @@ function PhilosophyPage() {
             className="text-[11px] uppercase tracking-[0.22em] border-b border-foreground pb-1"
           >
             Explore the Collection
-          </Link>
-          <Link
-            to="/philosophy"
-            className="text-[11px] uppercase tracking-[0.22em] link-underline"
-          >
-            Read again
           </Link>
         </div>
       </section>
