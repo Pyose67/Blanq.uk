@@ -4,7 +4,7 @@ import heroImg from "@/assets/hero-blanq.jpg";
 import fabricImg from "@/assets/fabric-merino.jpg";
 import lifestyleImg from "@/assets/lifestyle-london.jpg";
 import { ProductCard } from "@/components/site/ProductCard";
-import { getAllProducts, getBestSellers, type ShopifyProduct } from "@/lib/shopify";
+import { getAllProducts, getBestSellers, getRecentProducts, type ShopifyProduct } from "@/lib/shopify";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -28,6 +28,7 @@ export const Route = createFileRoute("/")({
 function Home() {
   const [products, setProducts] = useState<ShopifyProduct[] | null>(null);
   const [bestSellers, setBestSellers] = useState<ShopifyProduct[] | null>(null);
+  const [recent, setRecent] = useState<ShopifyProduct[] | null>(null);
 
   useEffect(() => {
     getAllProducts(50)
@@ -39,9 +40,10 @@ function Home() {
     getBestSellers(3)
       .then(setBestSellers)
       .catch(() => setBestSellers([]));
+    getRecentProducts(10)
+      .then(setRecent)
+      .catch(() => setRecent([]));
   }, []);
-
-  const recent = (products ?? []).slice(0, 4);
 
   return (
     <>
@@ -227,63 +229,43 @@ function Home() {
       </section>
 
       {/* NEW ARRIVALS */}
-      <section className="mx-auto max-w-[1480px] px-6 md:px-10 py-28 md:py-36">
+      <section className="mx-auto max-w-[1480px] px-6 md:px-10 pt-28 md:pt-36 pb-4 md:pb-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 reveal">
           <div>
             <p className="eyebrow mb-4">Recent</p>
             <h2 className="font-serif text-4xl md:text-5xl">New Arrivals</h2>
           </div>
           <Link
-            to="/collections"
+            to="/new-arrivals"
             className="link-underline text-[11px] uppercase tracking-[0.22em]"
           >
             View all
           </Link>
         </div>
-        {products === null ? (
-          <ProductGridSkeleton />
+        {recent === null ? (
+          <div className="md:hidden mx-auto"><ProductGridSkeleton /></div>
         ) : recent.length === 0 ? (
           <EmptyState />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16 stagger-grid">
-            {recent.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
+          <>
+            {/* Mobile carousel */}
+            <div className="md:hidden flex gap-5 overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-6 pb-2">
+              {recent.slice(0, 3).map((p) => (
+                <div key={p.id} className="snap-start shrink-0 w-[78vw]">
+                  <ProductCard product={p} />
+                </div>
+              ))}
+            </div>
+            {/* Desktop grid */}
+            <div className="hidden md:grid grid-cols-3 gap-x-12 stagger-grid mx-auto max-w-[1480px] px-10">
+              {recent.slice(0, 3).map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          </>
         )}
       </section>
 
-      {/* PRIVATE LIST */}
-      <section className="border-t border-border">
-        <div className="mx-auto max-w-[1480px] px-6 md:px-10 py-28 md:py-36">
-          <div className="grid md:grid-cols-12 gap-10 items-end">
-            <div className="md:col-span-7 reveal">
-              <p className="eyebrow mb-6">The Private List</p>
-              <h2 className="font-serif text-3xl md:text-5xl leading-tight max-w-xl">
-                A quiet correspondence. Notes on new pieces, materials, and provenance — sent
-                infrequently.
-              </h2>
-            </div>
-            <form
-              onSubmit={(e) => e.preventDefault()}
-              className="md:col-span-5 flex items-end gap-4 border-b border-foreground pb-3 reveal"
-            >
-              <input
-                type="email"
-                placeholder="your@address.co.uk"
-                className="flex-1 bg-transparent outline-none text-base placeholder:text-muted-foreground/70"
-                aria-label="Email"
-              />
-              <button
-                type="submit"
-                className="text-[11px] uppercase tracking-[0.22em] text-foreground hover:opacity-70 transition-opacity"
-              >
-                Subscribe
-              </button>
-            </form>
-          </div>
-        </div>
-      </section>
     </>
   );
 }

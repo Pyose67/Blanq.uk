@@ -52,6 +52,8 @@ export interface ShopifyProduct {
   descriptionHtml: string;
   vendor: string;
   productType: string;
+  category: string | null;
+  createdAt: string;
   images: ShopifyImage[];
   options: ShopifyProductOption[];
   variants: ShopifyVariant[];
@@ -177,7 +179,9 @@ const PRODUCT_FIELDS = `
       }
     }
   }
-sizeGuide: metafield(namespace: "custom", key: "size_guide") { value type }
+  createdAt
+  category { name }
+  sizeGuide: metafield(namespace: "custom", key: "size_guide") { value type }
   materialProps: metafield(namespace: "custom", key: "propriedades_do_material") { value type }
   techNotes: metafield(namespace: "custom", key: "tech_notes") { value type }
   fitNotes: metafield(namespace: "custom", key: "fit_notes") { value type }
@@ -187,6 +191,14 @@ sizeGuide: metafield(namespace: "custom", key: "size_guide") { value type }
 const PRODUCTS_QUERY = `
   query GetProducts($first: Int!, $query: String) {
     products(first: $first, query: $query) {
+      edges { node { ${PRODUCT_FIELDS} } }
+    }
+  }
+`;
+
+const RECENT_PRODUCTS_QUERY = `
+  query GetRecentProducts($first: Int!) {
+    products(first: $first, sortKey: CREATED_AT, reverse: true) {
       edges { node { ${PRODUCT_FIELDS} } }
     }
   }
@@ -257,6 +269,8 @@ function normalizeProduct(node: any): ShopifyProduct {
       price: e.node.price,
       selectedOptions: e.node.selectedOptions ?? [],
     })),
+    createdAt: node.createdAt ?? "",
+    category: node.category?.name ?? null,
     metafields: {
       sizeGuide: parseJsonMetafield<SizeGuideRow[]>(node.sizeGuide),
       materialProps: parseJsonMetafield<{ title: string; body: string }[]>(node.materialProps),
@@ -330,6 +344,18 @@ function richTextNodeToHtml(node: any): string {
 // =====================================================================
 // Public API
 // =====================================================================
+
+export async function getRecentProducts(first = 10): Promise<ShopifyProduct[]> {
+  const json = await storefrontApiRequest<{ products: { edges: { node: any }[] } }>(
+    RECENT_PRODUCTS_QUERY,
+    { first },
+  );
+  const edges = json?.data?.products?.edges ?? [];
+  const cutoff = Date.now() - 90 * 24 * 60 * 60 * 1000;
+  return edges
+    .map((e) => normalizeProduct(e.node))
+    .filter((p) => new Date(p.createdAt).getTime() >= cutoff);
+}
 
 export async function getBestSellers(first = 3): Promise<ShopifyProduct[]> {
   const json = await storefrontApiRequest<{ products: { edges: { node: any }[] } }>(

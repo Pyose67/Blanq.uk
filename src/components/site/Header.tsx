@@ -12,15 +12,19 @@ import { useCart } from "@/lib/cart";
 
 const desktopNav = [
   { to: "/philosophy", label: "Philosophy" },
+  { to: "/atelier", label: "Atelier" },
   { to: "/collections", label: "Collections" },
-  { to: "/collections/$series", params: { series: "new-arrivals" }, label: "New Arrivals" },
+  { to: "/catalogue", label: "All Pieces" },
+  { to: "/new-arrivals", label: "New Arrivals" },
 ] as const;
 
 const mobileNav = [
   { to: "/", label: "Home" },
+  { to: "/catalogue", label: "All Pieces" },
   { to: "/collections", label: "Collections" },
   { to: "/philosophy", label: "Philosophy" },
-  { to: "/collections/$series", params: { series: "new-arrivals" }, label: "New Arrivals" },
+  { to: "/atelier", label: "Atelier" },
+  { to: "/new-arrivals", label: "New Arrivals" },
 ] as const;
 
 export function Header() {
@@ -50,14 +54,14 @@ export function Header() {
               <Menu className="h-5 w-5" strokeWidth={1.25} />
             </button>
             <nav className="hidden md:flex items-center gap-8 text-[11px] uppercase tracking-[0.22em] text-foreground/85">
-              {desktopNav.slice(0, 2).map((item) =>
+              {desktopNav.slice(0, 4).map((item) =>
                 "params" in item ? (
                   <Link
                     key={item.label}
                     to={item.to}
                     params={item.params}
                     className="link-underline"
-                    activeProps={{ className: "link-underline text-foreground" }}
+                    activeProps={{ className: "link-underline nav-active" }}
                   >
                     {item.label}
                   </Link>
@@ -66,7 +70,7 @@ export function Header() {
                     key={item.label}
                     to={item.to}
                     className="link-underline"
-                    activeProps={{ className: "link-underline text-foreground" }}
+                    activeProps={{ className: "link-underline nav-active" }}
                   >
                     {item.label}
                   </Link>
@@ -83,12 +87,12 @@ export function Header() {
           {/* Right — desktop link + bag */}
           <div className="justify-self-end flex items-center gap-5 md:gap-7">
             <Link
-              to={desktopNav[2].to}
-              params={desktopNav[2].params}
+              to={desktopNav[4].to}
+              params={desktopNav[4].params}
               className="hidden md:inline-block link-underline text-[11px] uppercase tracking-[0.22em] text-foreground/85"
-              activeProps={{ className: "link-underline text-foreground" }}
+              activeProps={{ className: "link-underline nav-active" }}
             >
-              {desktopNav[2].label}
+              {desktopNav[4].label}
             </Link>
             <button
               type="button"

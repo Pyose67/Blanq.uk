@@ -26,10 +26,20 @@ function CollectionsIndexPage() {
     <>
       <section className="border-b border-border">
         <div className="mx-auto max-w-[1480px] px-6 md:px-10 py-20 md:py-28">
-          <p className="eyebrow mb-6 reveal-subtle">Catalogue</p>
-          <h1 className="font-serif text-5xl md:text-7xl leading-[1.05] tracking-tight max-w-3xl reveal">
-            Collections
-          </h1>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+              <p className="eyebrow mb-6 reveal-subtle">Catalogue</p>
+              <h1 className="font-serif text-5xl md:text-7xl leading-[1.05] tracking-tight max-w-3xl reveal">
+                Collections
+              </h1>
+            </div>
+            <Link
+              to="/catalogue"
+              className="link-underline text-[11px] uppercase tracking-[0.22em] shrink-0"
+            >
+              All Pieces
+            </Link>
+          </div>
         </div>
       </section>
 

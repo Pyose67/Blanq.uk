@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import fabricImg from "@/assets/fabric-merino.jpg";
-import atelierImg from "@/assets/atelier-interior.jpg";
-import provenanceImg from "@/assets/provenance-studio.jpg";
-import lifestyleImg from "@/assets/lifestyle-london.jpg";
+import atelierSwatchesImg from "@/assets/atelier-swatches.png";
+import atelierYarnImg from "@/assets/atelier-yarn.png";
+import atelierWorkshopImg from "@/assets/atelier-workshop.png";
+import atelierFinishImg from "@/assets/atelier-finish.png";
 import productImg from "@/assets/product-coat.jpg";
 
 export const Route = createFileRoute("/atelier")({
@@ -44,7 +44,7 @@ function AtelierPage() {
       {/* I — THE DECISION */}
       <section className="bg-charcoal text-offwhite py-32 md:py-44 relative overflow-hidden">
         <img
-          src={atelierImg}
+          src={atelierSwatchesImg}
           alt=""
           loading="lazy"
           width={1920}
@@ -76,12 +76,12 @@ function AtelierPage() {
       {/* II — THE YARN */}
       <section className="bg-charcoal text-offwhite py-32 md:py-44 relative overflow-hidden">
         <img
-          src={fabricImg}
+          src={atelierYarnImg}
           alt=""
           loading="lazy"
           width={1920}
           height={1080}
-          className="absolute inset-0 h-full w-full object-cover opacity-20"
+          className="absolute inset-0 h-full w-full object-cover opacity-[0.18]"
         />
         <div className="relative mx-auto max-w-[1480px] px-6 md:px-10">
           <div className="grid md:grid-cols-12 gap-10 md:gap-16 items-start">
@@ -108,12 +108,12 @@ function AtelierPage() {
       {/* III — THE HAND */}
       <section className="bg-charcoal text-offwhite py-32 md:py-44 relative overflow-hidden">
         <img
-          src={provenanceImg}
+          src={atelierWorkshopImg}
           alt=""
           loading="lazy"
           width={1920}
           height={1080}
-          className="absolute inset-0 h-full w-full object-cover opacity-[0.15]"
+          className="absolute inset-0 h-full w-full object-cover opacity-[0.18]"
         />
         <div className="relative mx-auto max-w-[1480px] px-6 md:px-10">
           <div className="grid md:grid-cols-12 gap-10 md:gap-16 items-start">
@@ -140,12 +140,12 @@ function AtelierPage() {
       {/* IV — THE FINISH */}
       <section className="bg-charcoal text-offwhite py-32 md:py-44 relative overflow-hidden">
         <img
-          src={lifestyleImg}
+          src={atelierFinishImg}
           alt=""
           loading="lazy"
           width={1920}
           height={1080}
-          className="absolute inset-0 h-full w-full object-cover opacity-20"
+          className="absolute inset-0 h-full w-full object-cover opacity-[0.18]"
         />
         <div className="relative mx-auto max-w-[1480px] px-6 md:px-10">
           <div className="grid md:grid-cols-12 gap-10 md:gap-16 items-start">
