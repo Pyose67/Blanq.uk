@@ -231,10 +231,9 @@ export function CookieBanner() {
         <div className="relative w-full md:max-w-lg md:mx-6 bg-[#F4F1ED] border-t md:border border-[#D6D1C8]">
           <div className="px-8 py-10 md:py-12">
             <p className="eyebrow mb-5">Cookies</p>
-            <p className="text-sm text-[#1A1A1A] leading-relaxed mb-8">
+            <p className="text-sm text-[#1A1A1A] leading-relaxed mb-2">
               We use cookies to understand how Blanq is browsed and to reach people who might love
-              our pieces. Accept all, manage your preferences, or decline. Your choice is
-              remembered.{" "}
+              our pieces.{" "}
               <a
                 href="/policies/privacy-policy"
                 target="_blank"
@@ -244,6 +243,9 @@ export function CookieBanner() {
                 Privacy policy
               </a>
               .
+            </p>
+            <p className="text-xs text-[#1A1A1A]/60 mb-8">
+              You can update your preferences at any time via the footer.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
