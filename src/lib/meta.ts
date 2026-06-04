@@ -3,10 +3,21 @@ function getCookie(name: string): string {
   return document.cookie.match(new RegExp(`(?:^|;\\s*)${name}=([^;]*)`))?.[1] ?? "";
 }
 
+function getMarketingConsent(): boolean {
+  try {
+    const match = document.cookie.match(/consent_state=([^;]+)/);
+    if (!match) return false;
+    return JSON.parse(decodeURIComponent(match[1]))?.marketing === true;
+  } catch {
+    return false;
+  }
+}
+
 type MetaCustomData = Record<string, unknown>;
 
 export function trackMeta(eventName: string, customData: MetaCustomData = {}) {
   if (typeof window === "undefined") return;
+  if (!getMarketingConsent()) return;
 
   const eventId = typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
     ? crypto.randomUUID()

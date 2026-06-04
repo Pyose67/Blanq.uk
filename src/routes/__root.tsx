@@ -2,6 +2,7 @@ import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } f
 import { useEffect, useRef } from "react";
 import { trackMeta } from "@/lib/meta";
 import Clarity from "@microsoft/clarity";
+import { CookieBanner, readConsent } from "@/components/site/CookieBanner";
 
 declare global {
   interface Window {
@@ -97,7 +98,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
     <html lang="en-GB">
       <head>
         <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
-        <script dangerouslySetInnerHTML={{ __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${GA_ID}',{send_page_view:false});` }} />
+        <script dangerouslySetInnerHTML={{ __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});gtag('js',new Date());gtag('config','${GA_ID}',{send_page_view:false});` }} />
         <script dangerouslySetInnerHTML={{ __html: `!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${META_PIXEL_ID}');` }} />
         <HeadContent />
       </head>
@@ -116,6 +117,7 @@ function usePageTracking() {
   useEffect(() => {
     if (prev.current === pathname) return;
     prev.current = pathname;
+    if (!readConsent()?.analytics) return;
     window.gtag?.("event", "page_view", {
       page_path: pathname,
       page_location: window.location.href,
@@ -189,7 +191,16 @@ function RootComponent() {
   usePageTracking();
   useEffect(() => {
     Clarity.init("vwbjae5t96");
-    Clarity.consentV2(); // granted by default — update when cookie banner is added
+    if (readConsent()?.analytics) {
+      Clarity.consentV2();
+    }
+
+    function onConsentUpdate(e: Event) {
+      const choices = (e as CustomEvent).detail;
+      if (choices?.analytics) Clarity.consentV2();
+    }
+    document.addEventListener("blanq:consent-update", onConsentUpdate);
+    return () => document.removeEventListener("blanq:consent-update", onConsentUpdate);
   }, []);
   return (
     <CartProvider>
@@ -202,6 +213,7 @@ function RootComponent() {
         <Footer />
         <CartDrawer />
       </div>
+      <CookieBanner />
     </CartProvider>
   );
 }

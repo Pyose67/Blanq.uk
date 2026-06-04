@@ -10,7 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PhilosophyRouteImport } from './routes/philosophy'
+import { Route as NewArrivalsRouteImport } from './routes/new-arrivals'
 import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as CatalogueRouteImport } from './routes/catalogue'
+import { Route as AtelierRouteImport } from './routes/atelier'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CollectionsIndexRouteImport } from './routes/collections.index'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
@@ -22,9 +25,24 @@ const PhilosophyRoute = PhilosophyRouteImport.update({
   path: '/philosophy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NewArrivalsRoute = NewArrivalsRouteImport.update({
+  id: '/new-arrivals',
+  path: '/new-arrivals',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CheckoutRoute = CheckoutRouteImport.update({
   id: '/checkout',
   path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatalogueRoute = CatalogueRouteImport.update({
+  id: '/catalogue',
+  path: '/catalogue',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AtelierRoute = AtelierRouteImport.update({
+  id: '/atelier',
+  path: '/atelier',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -55,7 +73,10 @@ const CollectionsSeriesRoute = CollectionsSeriesRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/atelier': typeof AtelierRoute
+  '/catalogue': typeof CatalogueRoute
   '/checkout': typeof CheckoutRoute
+  '/new-arrivals': typeof NewArrivalsRoute
   '/philosophy': typeof PhilosophyRoute
   '/collections/$series': typeof CollectionsSeriesRoute
   '/policies/$handle': typeof PoliciesHandleRoute
@@ -64,7 +85,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/atelier': typeof AtelierRoute
+  '/catalogue': typeof CatalogueRoute
   '/checkout': typeof CheckoutRoute
+  '/new-arrivals': typeof NewArrivalsRoute
   '/philosophy': typeof PhilosophyRoute
   '/collections/$series': typeof CollectionsSeriesRoute
   '/policies/$handle': typeof PoliciesHandleRoute
@@ -74,7 +98,10 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/atelier': typeof AtelierRoute
+  '/catalogue': typeof CatalogueRoute
   '/checkout': typeof CheckoutRoute
+  '/new-arrivals': typeof NewArrivalsRoute
   '/philosophy': typeof PhilosophyRoute
   '/collections/$series': typeof CollectionsSeriesRoute
   '/policies/$handle': typeof PoliciesHandleRoute
@@ -85,7 +112,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/atelier'
+    | '/catalogue'
     | '/checkout'
+    | '/new-arrivals'
     | '/philosophy'
     | '/collections/$series'
     | '/policies/$handle'
@@ -94,7 +124,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/atelier'
+    | '/catalogue'
     | '/checkout'
+    | '/new-arrivals'
     | '/philosophy'
     | '/collections/$series'
     | '/policies/$handle'
@@ -103,7 +136,10 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/atelier'
+    | '/catalogue'
     | '/checkout'
+    | '/new-arrivals'
     | '/philosophy'
     | '/collections/$series'
     | '/policies/$handle'
@@ -113,7 +149,10 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AtelierRoute: typeof AtelierRoute
+  CatalogueRoute: typeof CatalogueRoute
   CheckoutRoute: typeof CheckoutRoute
+  NewArrivalsRoute: typeof NewArrivalsRoute
   PhilosophyRoute: typeof PhilosophyRoute
   CollectionsSeriesRoute: typeof CollectionsSeriesRoute
   PoliciesHandleRoute: typeof PoliciesHandleRoute
@@ -130,11 +169,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PhilosophyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/new-arrivals': {
+      id: '/new-arrivals'
+      path: '/new-arrivals'
+      fullPath: '/new-arrivals'
+      preLoaderRoute: typeof NewArrivalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/checkout': {
       id: '/checkout'
       path: '/checkout'
       fullPath: '/checkout'
       preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catalogue': {
+      id: '/catalogue'
+      path: '/catalogue'
+      fullPath: '/catalogue'
+      preLoaderRoute: typeof CatalogueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/atelier': {
+      id: '/atelier'
+      path: '/atelier'
+      fullPath: '/atelier'
+      preLoaderRoute: typeof AtelierRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -177,7 +237,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AtelierRoute: AtelierRoute,
+  CatalogueRoute: CatalogueRoute,
   CheckoutRoute: CheckoutRoute,
+  NewArrivalsRoute: NewArrivalsRoute,
   PhilosophyRoute: PhilosophyRoute,
   CollectionsSeriesRoute: CollectionsSeriesRoute,
   PoliciesHandleRoute: PoliciesHandleRoute,

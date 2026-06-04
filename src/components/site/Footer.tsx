@@ -109,6 +109,14 @@ export function Footer() {
                   </li>
                 ))}
               {!policies && <li className="text-muted-foreground text-xs">Loading…</li>}
+              <li>
+                <button
+                  onClick={() => document.dispatchEvent(new CustomEvent("blanq:open-cookie-preferences"))}
+                  className="link-underline text-sm"
+                >
+                  Cookie preferences
+                </button>
+              </li>
             </ul>
           </div>
           <div>
