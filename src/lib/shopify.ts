@@ -79,6 +79,7 @@ export interface ShopPolicies {
   termsOfService: ShopPolicy | null;
   shippingPolicy: ShopPolicy | null;
   refundPolicy: ShopPolicy | null;
+  contactInformation: ShopPolicy | null;
 }
 
 export interface ProductReview {
@@ -221,10 +222,11 @@ const PRODUCT_BY_HANDLE_QUERY = `
 const POLICIES_QUERY = `
   query Policies {
     shop {
-      privacyPolicy  { id title handle url }
-      termsOfService { id title handle url }
-      shippingPolicy { id title handle url }
-      refundPolicy   { id title handle url }
+      privacyPolicy      { id title handle url }
+      termsOfService     { id title handle url }
+      shippingPolicy     { id title handle url }
+      refundPolicy       { id title handle url }
+      contactInformation { id title handle url }
     }
   }
 `;
@@ -391,6 +393,7 @@ export async function getShopPolicies(): Promise<ShopPolicies> {
       termsOfService: null,
       shippingPolicy: null,
       refundPolicy: null,
+      contactInformation: null,
     }
   );
 }

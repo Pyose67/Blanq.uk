@@ -18,6 +18,9 @@ export function Footer() {
   const [emailCopied, setEmailCopied] = useState(false);
 
   function handleEmailClick(e: React.MouseEvent<HTMLAnchorElement>) {
+    const isMobile = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+    if (isMobile) return;
+    e.preventDefault();
     navigator.clipboard?.writeText(siteConfig.contact.email).then(() => {
       setEmailCopied(true);
       setTimeout(() => setEmailCopied(false), 2000);
@@ -38,6 +41,7 @@ export function Footer() {
     { policy: policies?.termsOfService, label: "Terms" },
     { policy: policies?.shippingPolicy, label: "Shipping" },
     { policy: policies?.refundPolicy, label: "Returns" },
+    { policy: policies?.contactInformation, label: "Contact" },
   ];
 
   return (
